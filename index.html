@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RISMAF — Portal Remaja Islam</title>
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="/_sdk/data_sdk.js"></script>
+  <!--script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Poppins:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -132,47 +132,39 @@ tailwind.config = {
   </style>
   <style>body { box-sizing: border-box; }</style>
   <script>
-async function initDataSDK() {
-  const handler = {
-    onDataChanged(data) {
-      APP.allData = data;
-      ADMIN_PENGURUS = data.filter(d => d.type === 'pengurus');
-      updatePublicStats();
-    }
-  };
-  
-  const result = await window.dataSdk.init(handler);
-  if(!result.isOk) {
-    console.error('Failed to init Data SDK');
-    return;
-  }
-  
-  // Tunggu sebentar agar data terisi
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Buat akun admin default jika belum ada (HANYA jika benar-benar kosong)
-  const existingAdmin = APP.allData.find(d => d.type === 'pengurus' && d.name === 'Admin');
-  const totalPengurus = APP.allData.filter(d => d.type === 'pengurus').length;
-  
-  if(!existingAdmin && totalPengurus === 0 && APP.allData.length < 999) {
-    console.log('Creating default admin account...');
-    const createResult = await window.dataSdk.create({
-      type: 'pengurus',
-      name: 'Admin',
-      role: 'admin',
-      password: '12345',
-      created_at: new Date().toISOString()
-    });
+let sdkInitialized = false;
+
+//async function initDataSDK() {
+  try {
+    const handler = {
+      onDataChanged(data) {
+        APP.allData = data;
+        ADMIN_PENGURUS = data.filter(d => d.type === 'pengurus');
+        updatePublicStats();
+      }
+    };
     
-    if(createResult.isOk) {
-      console.log('Default admin account created successfully');
-    } else {
-      console.error('Failed to create default admin account:', createResult.error);
+    const result = await window.dataSdk.init(handler);
+    if(!result.isOk) {
+      console.error('Failed to init Data SDK:', result.error);
+      toast('⚠️ Koneksi database sedang bermasalah. Silakan refresh halaman.', 'error');
+      return;
     }
+    
+    sdkInitialized = true;
+    console.log('Data SDK initialized successfully');
+  } catch(err) {
+    console.error('SDK init error:', err);
+    toast('⚠️ Terjadi kesalahan saat menghubungkan database', 'error');
   }
 }
 
-initDataSDK();
+// Tunggu DOM siap sebelum init
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDataSDK);
+} else {
+  initDataSDK();
+}
   </script>
  </head>
  <body class="h-full bg-smoke-100 text-gray-800 overflow-hidden">
@@ -181,8 +173,7 @@ initDataSDK();
    <div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
     <div class="bg-white rounded-xl p-6 max-w-sm mx-4 shadow-2xl animate-fade">
      <p id="confirm-msg" class="text-gray-700 mb-4"></p>
-     <div class="flex gap-3 justify-end">
-      <button onclick="closeConfirm()" class="px-4 py-2 rounded-lg bg-smoke-200 hover:bg-smoke-300 text-sm font-medium">Batal</button> <button id="confirm-btn" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium">Konfirmasi</button>
+     <div class="flex gap-3 justify-end"><button onclick="closeConfirm()" class="px-4 py-2 rounded-lg bg-smoke-200 hover:bg-smoke-300 text-sm font-medium">Batal</button> <button id="confirm-btn" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium">Konfirmasi</button>
      </div>
     </div>
    </div>
@@ -190,16 +181,14 @@ initDataSDK();
     <nav class="bg-white/90 backdrop-blur-md border-b border-smoke-200 sticky top-0 z-40">
      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
-       <div id="nav-logo-public" class="w-10 h-10 rounded-full bg-emerald-900 flex items-center justify-center geo-float overflow-hidden">
-        <img src="https://iili.io/qWvjHaj.png" alt="Logo RISMAF" style="width:100%;height:100%;object-fit:contain;border-radius:50%;padding:2px" loading="lazy" onerror="console.error('Logo failed to load:', this.src); this.style.display='none'">
+       <div id="nav-logo-public" class="w-10 h-10 rounded-full bg-emerald-900 flex items-center justify-center geo-float overflow-hidden"><img src="https://iili.io/qWvjHaj.png" alt="Logo RISMAF" style="width:100%;height:100%;object-fit:contain;border-radius:50%;padding:2px" loading="lazy" onerror="console.error('Logo failed to load:', this.src); this.style.display='none'">
        </div>
        <div>
         <h1 id="pub-org-name" class="font-bold text-emerald-900 text-lg leading-tight">RISMAF</h1>
         <p id="pub-org-subtitle" class="text-xs text-gray-500">Remaja Islam Masjid Al-Falah</p>
        </div>
       </div>
-      <div class="flex items-center gap-2">
-       <button onclick="showPublicSection('beranda')" class="pub-nav-btn px-3 py-1.5 text-sm font-medium text-emerald-900 hover:bg-emerald-50 rounded-lg transition">Beranda</button> <button onclick="showPublicSection('profil')" class="pub-nav-btn px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-emerald-50 rounded-lg transition">Profil</button> <button onclick="showPublicSection('jadwal')" class="pub-nav-btn px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-emerald-50 rounded-lg transition">Jadwal</button> <button onclick="showPublicSection('donasi')" class="pub-nav-btn px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-emerald-50 rounded-lg transition">Donasi</button> <button onclick="showPublicSection('feedback')" class="pub-nav-btn px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-emerald-50 rounded-lg transition">Masukan</button> <button onclick="showLoginPanel()" class="ml-2 px-4 py-1.5 text-sm font-semibold bg-emerald-900 text-white rounded-lg hover:bg-emerald-800 transition flex items-center gap-1.5"> <i data-lucide="log-in" style="width:14px;height:14px"></i> Masuk </button>
+      <div class="flex items-center gap-2"><button onclick="showPublicSection('beranda')" class="pub-nav-btn px-3 py-1.5 text-sm font-medium text-emerald-900 hover:bg-emerald-50 rounded-lg transition">Beranda</button> <button onclick="showPublicSection('profil')" class="pub-nav-btn px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-emerald-50 rounded-lg transition">Profil</button> <button onclick="showPublicSection('jadwal')" class="pub-nav-btn px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-emerald-50 rounded-lg transition">Jadwal</button> <button onclick="showPublicSection('donasi')" class="pub-nav-btn px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-emerald-50 rounded-lg transition">Donasi</button> <button onclick="showPublicSection('feedback')" class="pub-nav-btn px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-emerald-50 rounded-lg transition">Masukan</button> <button onclick="showLoginPanel()" class="ml-2 px-4 py-1.5 text-sm font-semibold bg-emerald-900 text-white rounded-lg hover:bg-emerald-800 transition flex items-center gap-1.5"> <i data-lucide="log-in" style="width:14px;height:14px"></i> Masuk </button>
       </div>
      </div>
     </nav>
@@ -208,12 +197,13 @@ initDataSDK();
       <div class="max-w-6xl mx-auto px-4 py-16 text-center">
        <div class="animate-fade">
         <p class="font-amiri text-2xl text-gold-500 mb-2">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</p>
-        <h2 id="pub-welcome" class="text-4xl font-extrabold text-emerald-900 mb-3">Selamat Datang di Portal RISMAF</h2>
+        <h2 id="pub-welcome" class="text-4xl font-extrabold text-emerald-900 mb-3">Selamat Pergi di Portal RISMAF</h2>
         <p class="text-gray-500 max-w-xl mx-auto">Platform digital untuk Remaja Islam Masjid Al-Falah. Mengelola kegiatan, keuangan, dan keanggotaan secara modern dan transparan.</p>
        </div>
        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12">
         <div class="bg-white rounded-xl p-5 card-hover animate-fade-d1 border border-smoke-200">
-         <div class="w-12 h-12 rounded-xl stat-card flex items-center justify-center mx-auto mb-3"><i data-lucide="users" style="width:22px;height:22px;color:white"></i>
+         <div class="w-12 h-12 rounded-xl stat-card flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="users" style="width:22px;height:22px;color:white"></i>
          </div>
          <div id="pub-stat-members" class="text-2xl font-bold text-emerald-900">
           0
@@ -221,7 +211,8 @@ initDataSDK();
          <p class="text-xs text-gray-500 mt-1">Total Anggota</p>
         </div>
         <div class="bg-white rounded-xl p-5 card-hover animate-fade-d1 border border-smoke-200">
-         <div class="w-12 h-12 rounded-xl gold-gradient flex items-center justify-center mx-auto mb-3"><i data-lucide="calendar" style="width:22px;height:22px;color:white"></i>
+         <div class="w-12 h-12 rounded-xl gold-gradient flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="calendar" style="width:22px;height:22px;color:white"></i>
          </div>
          <div id="pub-stat-events" class="text-2xl font-bold text-emerald-900">
           0
@@ -229,7 +220,8 @@ initDataSDK();
          <p class="text-xs text-gray-500 mt-1">Kegiatan</p>
         </div>
         <div class="bg-white rounded-xl p-5 card-hover animate-fade-d2 border border-smoke-200">
-         <div class="w-12 h-12 rounded-xl stat-card flex items-center justify-center mx-auto mb-3"><i data-lucide="wallet" style="width:22px;height:22px;color:white"></i>
+         <div class="w-12 h-12 rounded-xl stat-card flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="wallet" style="width:22px;height:22px;color:white"></i>
          </div>
          <div id="pub-stat-balance" class="text-2xl font-bold text-emerald-900">
           Rp 0
@@ -237,7 +229,8 @@ initDataSDK();
          <p class="text-xs text-gray-500 mt-1">Saldo Kas</p>
         </div>
         <div class="bg-white rounded-xl p-5 card-hover animate-fade-d3 border border-smoke-200">
-         <div class="w-12 h-12 rounded-xl gold-gradient flex items-center justify-center mx-auto mb-3"><i data-lucide="book-open" style="width:22px;height:22px;color:white"></i>
+         <div class="w-12 h-12 rounded-xl gold-gradient flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="book-open" style="width:22px;height:22px;color:white"></i>
          </div>
          <div id="pub-stat-programs" class="text-2xl font-bold text-emerald-900">
           0
@@ -308,7 +301,8 @@ initDataSDK();
       <p class="text-gray-500 mb-8">Salurkan infaq Anda untuk pengembangan Masjid Al-Falah</p>
       <div class="bg-white rounded-2xl p-8 border border-smoke-200 max-w-md mx-auto">
        <div class="w-40 h-40 bg-emerald-50 rounded-xl mx-auto mb-4 flex items-center justify-center border-2 border-dashed border-emerald-300">
-        <div class="text-center"><i data-lucide="qr-code" style="width:48px;height:48px;color:#065f46" class="mx-auto"></i>
+        <div class="text-center">
+         <i data-lucide="qr-code" style="width:48px;height:48px;color:#065f46" class="mx-auto"></i>
          <p class="text-xs text-emerald-700 mt-2 font-medium">QRIS RISMAF</p>
         </div>
        </div>
@@ -325,15 +319,20 @@ initDataSDK();
      <div class="max-w-lg mx-auto px-4 py-12">
       <h2 class="text-2xl font-bold text-emerald-900 mb-4">Konfirmasi Infaq / Bayar Kas</h2>
       <form id="infaq-form" class="bg-white rounded-xl p-6 border border-smoke-200 space-y-4">
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="infaq-name">Nama Pengirim</label><input id="infaq-name" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="infaq-name">Nama Pengirim</label><input id="infaq-name" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required>
        </div>
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="infaq-phone">No. WhatsApp (untuk konfirmasi)</label><input id="infaq-phone" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="085xxx" required>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="infaq-phone">No. WhatsApp (untuk konfirmasi)</label><input id="infaq-phone" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="085xxx" required>
        </div>
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="infaq-type">Jenis</label><select id="infaq-type" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option value="Infaq">Infaq</option><option value="Bayar Kas">Bayar Kas</option><option value="Donasi Lainnya">Donasi Lainnya</option></select>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="infaq-type">Jenis</label><select id="infaq-type" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option value="Infaq">Infaq</option><option value="Bayar Kas">Bayar Kas</option><option value="Donasi Lainnya">Donasi Lainnya</option></select>
        </div>
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="infaq-amount">Jumlah (Rp)</label><input id="infaq-amount" type="number" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="infaq-amount">Jumlah (Rp)</label><input id="infaq-amount" type="number" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required>
        </div>
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="infaq-note">Catatan / Keterangan</label><textarea id="infaq-note" rows="2" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Contoh: Untuk kegiatan kajian rutin"></textarea>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="infaq-note">Catatan / Keterangan</label><textarea id="infaq-note" rows="2" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Contoh: Untuk kegiatan kajian rutin"></textarea>
        </div><button type="submit" class="w-full py-2.5 bg-emerald-900 text-white rounded-lg font-semibold hover:bg-emerald-800 transition text-sm">Kirim &amp; Hubungi Admin via WhatsApp</button>
       </form>
      </div>
@@ -343,13 +342,17 @@ initDataSDK();
       <h2 class="text-2xl font-bold text-emerald-900 mb-2 font-amiri">Kritik, Saran &amp; Masukan</h2>
       <p class="text-gray-500 text-sm mb-6">Sampaikan masukan Anda untuk kemajuan RISMAF</p>
       <form id="feedback-form" class="bg-white rounded-xl p-6 border border-smoke-200 space-y-4">
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="fb-name">Nama (opsional)</label><input id="fb-name" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Anonim">
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="fb-name">Nama (opsional)</label><input id="fb-name" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Anonim">
        </div>
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="fb-type">Jenis Masukan</label><select id="fb-type" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option>Kritik</option><option>Saran</option><option>Masukan</option><option>Pujian</option><option>Lainnya</option></select>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="fb-type">Jenis Masukan</label><select id="fb-type" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option>Kritik</option><option>Saran</option><option>Masukan</option><option>Pujian</option><option>Lainnya</option></select>
        </div>
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="fb-target">Ditujukan Kepada</label><select id="fb-target" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option>Organisasi</option><option>Ketua Umum</option><option>Sekretaris</option><option>Bendahara</option><option>Humas</option><option>Divisi Tertentu</option><option>Lainnya</option></select>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="fb-target">Ditujukan Kepada</label><select id="fb-target" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option>Organisasi</option><option>Ketua Umum</option><option>Sekretaris</option><option>Bendahara</option><option>Humas</option><option>Divisi Tertentu</option><option>Lainnya</option></select>
        </div>
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="fb-content">Isi Masukan</label><textarea id="fb-content" rows="4" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required placeholder="Tulis masukan Anda..."></textarea>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="fb-content">Isi Masukan</label><textarea id="fb-content" rows="4" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required placeholder="Tulis masukan Anda..."></textarea>
        </div><button type="submit" class="w-full py-2.5 bg-emerald-900 text-white rounded-lg font-semibold hover:bg-emerald-800 transition text-sm">Kirim Masukan</button>
       </form>
      </div>
@@ -357,7 +360,7 @@ initDataSDK();
     <footer class="bg-emerald-900 text-white py-8 mt-8">
      <div class="max-w-6xl mx-auto px-4 text-center">
       <p class="font-amiri text-gold-400 text-lg mb-1">RISMAF</p>
-      <p class="text-emerald-300 text-xs">Remaja Islam Masjid Al-Falah © 2026</p>
+      <p class="text-emerald-300 text-xs">Remaja Islam Masjid Al-Falah © 2025</p>
      </div>
     </footer>
    </div>
@@ -365,34 +368,37 @@ initDataSDK();
     <div class="min-h-full flex items-center justify-center islamic-pattern p-4" style="min-height:100%">
      <div class="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full animate-fade border border-smoke-200">
       <div class="text-center mb-6">
-       <div class="w-16 h-16 rounded-full bg-emerald-900 flex items-center justify-center mx-auto mb-3 pulse-gold">
-        <img src="https://iili.io/qWvjHaj.png" alt="Logo RISMAF" style="width:100%;height:100%;object-fit:contain;border-radius:50%;padding:3px" loading="lazy" onerror="console.error('Logo failed to load:', this.src); this.style.display='none'">
+       <div class="w-16 h-16 rounded-full bg-emerald-900 flex items-center justify-center mx-auto mb-3 pulse-gold"><img src="https://iili.io/qWvjHaj.png" alt="Logo RISMAF" style="width:100%;height:100%;object-fit:contain;border-radius:50%;padding:3px" loading="lazy" onerror="console.error('Logo failed to load:', this.src); this.style.display='none'">
        </div>
        <h2 class="text-xl font-bold text-emerald-900">Masuk ke Portal</h2>
        <p class="text-xs text-gray-500 mt-1">Pilih tipe akun Anda</p>
       </div>
-      <div class="flex gap-2 mb-6 bg-smoke-100 p-1 rounded-lg">
-       <button id="btn-login-pengurus" onclick="showLoginType('pengurus')" type="button" class="flex-1 px-3 py-2 text-sm font-semibold rounded-lg bg-white text-emerald-900 transition">👔 Pengurus</button> <button id="btn-login-anggota" onclick="showLoginType('anggota')" type="button" class="flex-1 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white rounded-lg transition">👥 Anggota</button>
+      <div class="flex gap-2 mb-6 bg-smoke-100 p-1 rounded-lg"><button id="btn-login-pengurus" onclick="showLoginType('pengurus')" type="button" class="flex-1 px-3 py-2 text-sm font-semibold rounded-lg bg-white text-emerald-900 transition">👔 Pengurus</button> <button id="btn-login-anggota" onclick="showLoginType('anggota')" type="button" class="flex-1 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white rounded-lg transition">👥 Anggota</button>
       </div>
       <form id="login-form" class="space-y-4">
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="login-user">Nama Pengurus</label><input id="login-user" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm" placeholder="Masukkan nama pengurus" required>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="login-user">Nama Pengurus</label><input id="login-user" type="email" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm" placeholder="Masukkan nama pengurus" required>
        </div>
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="login-pass">Password</label>
-        <div class="relative"><input id="login-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm pr-10" placeholder="Masukkan password" required> <button type="button" onclick="togglePasswordVisibility('login-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"> <i data-lucide="eye" style="width:16px;height:16px"></i> </button>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="login-pass">Password</label>
+        <div class="relative">
+         <input id="login-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm pr-10" placeholder="Masukkan password" required> <button type="button" onclick="togglePasswordVisibility('login-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"> <i data-lucide="eye" style="width:16px;height:16px"></i> </button>
         </div>
        </div>
        <div id="login-error" class="text-red-500 text-xs hidden"></div><button type="submit" id="login-btn" class="w-full py-2.5 bg-emerald-900 text-white rounded-lg font-semibold hover:bg-emerald-800 transition text-sm">Masuk</button>
       </form>
       <form id="anggota-login-form" class="space-y-4 hidden">
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="anggota-email">Email</label><input id="anggota-email" type="email" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm" placeholder="Masukkan email Anda" required>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="anggota-email">Email</label><input id="anggota-email" type="email" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm" placeholder="Masukkan email Anda" required>
        </div>
-       <div><label class="block text-sm font-medium text-gray-700 mb-1" for="anggota-pass">Password</label>
-        <div class="relative"><input id="anggota-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm pr-10" placeholder="Masukkan password" required> <button type="button" onclick="togglePasswordVisibility('anggota-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"> <i data-lucide="eye" style="width:16px;height:16px"></i> </button>
+       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="anggota-pass">Password</label>
+        <div class="relative">
+         <input id="anggota-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm pr-10" placeholder="Masukkan password" required> <button type="button" onclick="togglePasswordVisibility('anggota-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"> <i data-lucide="eye" style="width:16px;height:16px"></i> </button>
         </div>
        </div>
        <div id="anggota-login-error" class="text-red-500 text-xs hidden"></div><button type="submit" class="w-full py-2.5 bg-emerald-900 text-white rounded-lg font-semibold hover:bg-emerald-800 transition text-sm">Masuk</button>
-       <div id="register-link-section" class="flex gap-2 justify-between text-xs text-center">
-        <button type="button" onclick="showForgotPasswordPanel()" class="flex-1 text-emerald-600 hover:underline">Lupa Password?</button>
+       <div id="register-link-section" class="flex gap-2 justify-between text-xs text-center"><button type="button" onclick="showForgotPasswordPanel()" class="flex-1 text-emerald-600 hover:underline">Lupa Password?</button>
         <div class="text-gray-300">
          |
         </div><button type="button" onclick="showRegisterPanel()" class="flex-1 text-emerald-600 hover:underline">Daftar Akun</button>
@@ -409,17 +415,23 @@ initDataSDK();
        <p class="text-xs text-gray-500 mt-1">Akun akan aktif setelah disetujui admin</p>
       </div>
       <form id="register-form" class="space-y-3">
-       <div><label class="block text-xs font-medium text-gray-700 mb-1" for="reg-name">Nama Lengkap</label><input id="reg-name" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Nama lengkap Anda" required>
+       <div>
+        <label class="block text-xs font-medium text-gray-700 mb-1" for="reg-name">Nama Lengkap</label><input id="reg-name" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Nama lengkap Anda" required>
        </div>
-       <div><label class="block text-xs font-medium text-gray-700 mb-1" for="reg-email">Email</label><input id="reg-email" type="email" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Email aktif Anda" required>
+       <div>
+        <label class="block text-xs font-medium text-gray-700 mb-1" for="reg-email">Email</label><input id="reg-email" type="email" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Email aktif Anda" required>
        </div>
-       <div><label class="block text-xs font-medium text-gray-700 mb-1" for="reg-phone">No. Telepon</label><input id="reg-phone" type="tel" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="085xxx" required>
+       <div>
+        <label class="block text-xs font-medium text-gray-700 mb-1" for="reg-phone">No. Telepon</label><input id="reg-phone" type="tel" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="085xxx" required>
        </div>
-       <div><label class="block text-xs font-medium text-gray-700 mb-1" for="reg-gender">Gender</label><select id="reg-gender" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option>Laki-laki</option><option>Perempuan</option></select>
+       <div>
+        <label class="block text-xs font-medium text-gray-700 mb-1" for="reg-gender">Gender</label><select id="reg-gender" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option>Laki-laki</option><option>Perempuan</option></select>
        </div>
-       <div><label class="block text-xs font-medium text-gray-700 mb-1" for="reg-pass">Password</label><input id="reg-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Password minimal 6 karakter" required>
+       <div>
+        <label class="block text-xs font-medium text-gray-700 mb-1" for="reg-pass">Password</label><input id="reg-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Password minimal 6 karakter" required>
        </div>
-       <div><label class="block text-xs font-medium text-gray-700 mb-1" for="reg-pass2">Konfirmasi Password</label><input id="reg-pass2" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Ketik ulang password" required>
+       <div>
+        <label class="block text-xs font-medium text-gray-700 mb-1" for="reg-pass2">Konfirmasi Password</label><input id="reg-pass2" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Ketik ulang password" required>
        </div>
        <div id="register-error" class="text-red-500 text-xs hidden"></div><button type="submit" class="w-full py-2.5 bg-emerald-900 text-white rounded-lg font-semibold hover:bg-emerald-800 transition text-sm">Daftar</button>
       </form><button type="button" onclick="showLoginPanel()" class="mt-4 w-full text-center text-sm text-gray-500 hover:text-emerald-700 transition">← Sudah punya akun? Masuk</button>
@@ -431,8 +443,7 @@ initDataSDK();
      <aside class="w-64 bg-white border-r border-smoke-200 flex flex-col h-full flex-shrink-0 overflow-auto scrollbar-thin">
       <div class="p-4 border-b border-smoke-200">
        <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-full bg-emerald-900 flex items-center justify-center">
-         <img src="https://iili.io/qWvjHaj.png" alt="Logo RISMAF" style="width:100%;height:100%;object-fit:contain;border-radius:50%;padding:1px" loading="lazy" onerror="console.error('Logo failed to load:', this.src); this.style.display='none'">
+        <div class="w-8 h-8 rounded-full bg-emerald-900 flex items-center justify-center"><img src="https://iili.io/qWvjHaj.png" alt="Logo RISMAF" style="width:100%;height:100%;object-fit:contain;border-radius:50%;padding:1px" loading="lazy" onerror="console.error('Logo failed to load:', this.src); this.style.display='none'">
         </div>
         <div>
          <p class="font-bold text-emerald-900 text-sm">RISMAF</p>
@@ -440,18 +451,18 @@ initDataSDK();
         </div>
        </div>
       </div>
-      <nav class="flex-1 py-2 px-2 space-y-0.5">
-       <button onclick="navigateAnggota('dashboard')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 text-gray-600"> <i data-lucide="layout-dashboard" style="width:16px;height:16px"></i> Dashboard </button> <button onclick="navigateAnggota('profile')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 text-gray-600"> <i data-lucide="user" style="width:16px;height:16px"></i> Profil Saya </button> <button onclick="navigateAnggota('pengumuman')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 text-gray-600"> <i data-lucide="bell" style="width:16px;height:16px"></i> <span>Pengumuman <span id="badge-pengumuman" class="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-red-500 text-white"></span></span> </button> <button onclick="navigateAnggota('programs')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 text-gray-600"> <i data-lucide="target" style="width:16px;height:16px"></i> Program &amp; Kegiatan </button> <button onclick="navigateAnggota('attendance')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 text-gray-600"> <i data-lucide="clipboard-check" style="width:16px;height:16px"></i> Absensi </button>
+      <nav class="flex-1 py-2 px-2 space-y-0.5"><button onclick="navigateAnggota('dashboard')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 text-gray-600"> <i data-lucide="layout-dashboard" style="width:16px;height:16px"></i> Dashboard </button> <button onclick="navigateAnggota('profile')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 text-gray-600"> <i data-lucide="user" style="width:16px;height:16px"></i> Profil Saya </button> <button onclick="navigateAnggota('pengumuman')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 text-gray-600"> <i data-lucide="bell" style="width:16px;height:16px"></i> <span>Pengumuman <span id="badge-pengumuman" class="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-red-500 text-white"></span></span> </button> <button onclick="navigateAnggota('programs')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 text-gray-600"> <i data-lucide="target" style="width:16px;height:16px"></i> Program &amp; Kegiatan </button> <button onclick="navigateAnggota('attendance')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 text-gray-600"> <i data-lucide="clipboard-check" style="width:16px;height:16px"></i> Absensi </button>
       </nav>
       <div class="p-3 border-t border-smoke-200">
        <div class="flex items-center gap-2 mb-2 px-2">
-        <div class="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center"><i data-lucide="user" style="width:14px;height:14px;color:#065f46"></i>
+        <div class="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center">
+         <i data-lucide="user" style="width:14px;height:14px;color:#065f46"></i>
         </div>
         <div>
          <p id="member-username" class="text-xs font-semibold text-gray-800"></p>
          <p class="text-[10px] text-gray-500">Anggota</p>
         </div>
-       </div><button onclick="doLogoutMember()" class="w-full text-left px-2 py-1.5 text-xs text-red-500 hover:bg-red-50 rounded-lg flex items-center gap-1.5 transition"> <i data-lucide="log-out" style="width:12px;height:12px"></i> Keluar </button>
+       </div><button onclick="showMemberChangePassword()" class="w-full text-left px-2 py-1.5 text-xs text-emerald-600 hover:bg-emerald-50 rounded-lg flex items-center gap-1.5 transition"> <i data-lucide="key" style="width:12px;height:12px"></i> Ganti Password </button><button onclick="doLogoutMember()" class="w-full text-left px-2 py-1.5 text-xs text-red-500 hover:bg-red-50 rounded-lg flex items-center gap-1.5 transition"> <i data-lucide="log-out" style="width:12px;height:12px"></i> Keluar </button>
       </div>
      </aside>
      <main class="flex-1 overflow-auto h-full bg-smoke-50 scrollbar-thin">
@@ -467,8 +478,7 @@ initDataSDK();
      <aside id="sidebar" class="w-64 bg-white border-r border-smoke-200 flex flex-col h-full flex-shrink-0 overflow-auto scrollbar-thin">
       <div class="p-4 border-b border-smoke-200">
        <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-full bg-emerald-900 flex items-center justify-center">
-         <img src="https://iili.io/qWvjHaj.png" alt="Logo RISMAF" style="width:100%;height:100%;object-fit:contain;border-radius:50%;padding:1px" loading="lazy" onerror="console.error('Logo failed to load:', this.src); this.style.display='none'">
+        <div class="w-8 h-8 rounded-full bg-emerald-900 flex items-center justify-center"><img src="https://iili.io/qWvjHaj.png" alt="Logo RISMAF" style="width:100%;height:100%;object-fit:contain;border-radius:50%;padding:1px" loading="lazy" onerror="console.error('Logo failed to load:', this.src); this.style.display='none'">
         </div>
         <div>
          <p class="font-bold text-emerald-900 text-sm">RISMAF</p>
@@ -477,24 +487,58 @@ initDataSDK();
        </div>
       </div>
       <nav class="flex-1 py-2 px-2 space-y-0.5" id="sidebar-nav">
-       <button onclick="navigateTo('dashboard')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 text-gray-600"> <i data-lucide="layout-dashboard" style="width:16px;height:16px"></i> Dashboard </button>
+        <button onclick="navigateTo('dashboard')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+  <i data-lucide="layout-dashboard"></i> Dashboard
+</button>
+
+<button onclick="navigateTo('anggota')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+  <i data-lucide="users"></i> Data Anggota
+</button>
+
+<button onclick="navigateTo('pendaftaran')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+  <i data-lucide="user-plus"></i> Pendaftaran
+</button>
+
+<button onclick="navigateTo('kegiatan')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+  <i data-lucide="calendar"></i> Kegiatan
+</button>
+
+<button onclick="navigateTo('absensi')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+  <i data-lucide="clipboard-check"></i> Absensi
+</button>
+
+<button onclick="navigateTo('kas')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+  <i data-lucide="wallet"></i> Kas & Keuangan
+</button>
+
+<button onclick="navigateTo('pengumuman')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+  <i data-lucide="bell"></i> Pengumuman
+</button>
+
+<button onclick="navigateTo('struktur')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+  <i data-lucide="network"></i> Struktur
+</button>
+
+<button onclick="navigateTo('settings')" class="sidebar-link w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+  <i data-lucide="settings"></i> Pengaturan
+</button>
       </nav>
       <div class="p-3 border-t border-smoke-200">
        <div class="flex items-center gap-2 mb-2 px-2">
-        <div class="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center"><i data-lucide="user" style="width:14px;height:14px;color:#065f46"></i>
+        <div class="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center">
+         <i data-lucide="user" style="width:14px;height:14px;color:#065f46"></i>
         </div>
         <div>
          <p id="sidebar-username" class="text-xs font-semibold text-gray-800"></p>
          <p id="sidebar-jabatan" class="text-[10px] text-gray-500"></p>
         </div>
-       </div><button onclick="doLogout()" class="w-full text-left px-2 py-1.5 text-xs text-red-500 hover:bg-red-50 rounded-lg flex items-center gap-1.5 transition"> <i data-lucide="log-out" style="width:12px;height:12px"></i> Keluar </button>
+       </div><button onclick="showChangePasswordAdmin()" class="w-full text-left px-2 py-1.5 text-xs text-emerald-600 hover:bg-emerald-50 rounded-lg flex items-center gap-1.5 transition"> <i data-lucide="key" style="width:12px;height:12px"></i> Ganti Password </button><button onclick="doLogout()" class="w-full text-left px-2 py-1.5 text-xs text-red-500 hover:bg-red-50 rounded-lg flex items-center gap-1.5 transition"> <i data-lucide="log-out" style="width:12px;height:12px"></i> Keluar </button>
       </div>
      </aside>
      <main class="flex-1 overflow-auto h-full bg-smoke-50 scrollbar-thin">
       <header class="bg-white border-b border-smoke-200 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
        <h2 id="page-title" class="text-lg font-bold text-emerald-900"></h2>
-       <div class="flex items-center gap-2">
-        <span id="header-date" class="text-xs text-gray-500"></span>
+       <div class="flex items-center gap-3"><span id="header-date" class="text-xs text-gray-500"></span> <button onclick="refreshPage()" class="w-8 h-8 rounded-lg hover:bg-smoke-100 flex items-center justify-center text-gray-600 transition" title="Refresh halaman"> <i data-lucide="refresh-cw" style="width:16px;height:16px"></i> </button>
        </div>
       </header>
       <div id="main-content" class="p-6 animate-fade"></div>
@@ -503,14 +547,22 @@ initDataSDK();
    </div>
   </div>
   <script>
+/*
 let APP = {
   currentUser: null,
   allData: [],
   currentPage: 'dashboard',
   confirmCallback: null
 };
-
+*/
 let ADMIN_PENGURUS = [];
+
+// Default admin account for initial login
+const DEFAULT_ADMIN = {
+  name: 'admin',
+  role: 'admin',
+  password: 'admin123'
+};
 
 const ROLES = {
   'admin': { label: 'Administrator', canEditAbout: true, menus: ['dashboard','settings','about','divisions','user-management','members','member-cards','ekas','attendance','inventory','programs','feedback','news','schedule','proposals','letters','rab-approval','document-archive','broadcast'] },
@@ -527,6 +579,7 @@ const ROLES = {
 const MENU_ITEMS = {
   'dashboard': { icon: 'layout-dashboard', label: 'Dashboard' },
   'statistics': { icon: 'bar-chart-2', label: 'Statistik Anggota' },
+  'attendance-report': { icon: 'bar-chart-3', label: 'Rekap Absensi' },
   'settings': { icon: 'settings', label: 'Pengaturan Sistem' },
   'about': { icon: 'info', label: 'Tentang RISMAF' },
   'divisions': { icon: 'grid-3x3', label: 'Kelola Divisi' },
@@ -763,6 +816,12 @@ function downloadADARTPlaceholder(fileName) {
 // ==================== LOGIN ====================
 document.getElementById('login-form').addEventListener('submit', function(e) {
   e.preventDefault();
+  
+  if(!sdkInitialized) {
+    toast('Database masih memuat... Silakan tunggu sebentar', 'error');
+    return;
+  }
+  
   const name = document.getElementById('login-user').value.trim();
   const pass = document.getElementById('login-pass').value;
   const errEl = document.getElementById('login-error');
@@ -773,9 +832,30 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     return;
   }
   
+  console.log('Attempting login with:', name);
+  console.log('Available pengurus:', ADMIN_PENGURUS.map(p => p.name));
+  
+  // Check default admin first
+  if(name.toLowerCase() === DEFAULT_ADMIN.name.toLowerCase() && pass === DEFAULT_ADMIN.password) {
+    console.log('Login berhasil dengan admin default');
+    APP.currentUser = { 
+      username: DEFAULT_ADMIN.name, 
+      role: DEFAULT_ADMIN.role, 
+      name: DEFAULT_ADMIN.name, 
+      id: 'default-admin' 
+    };
+    errEl.classList.add('hidden');
+    document.getElementById('login-user').value = '';
+    document.getElementById('login-pass').value = '';
+    showAdminPanel();
+    return;
+  }
+  
+  // Then check database pengurus
   const pengurus = ADMIN_PENGURUS.find(d => d.name && d.name.toLowerCase() === name.toLowerCase() && d.password === pass);
   
   if(pengurus) {
+    console.log('Login berhasil:', pengurus.name);
     APP.currentUser = { 
       username: pengurus.name, 
       role: pengurus.role, 
@@ -787,7 +867,8 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     document.getElementById('login-pass').value = '';
     showAdminPanel();
   } else {
-    errEl.textContent = 'Nama pengurus atau password salah.';
+    console.log('Login gagal - user atau password salah');
+    errEl.textContent = 'Nama pengurus atau password salah. Coba: admin / admin123';
     errEl.classList.remove('hidden');
   }
 });
@@ -899,6 +980,23 @@ document.getElementById('register-form').addEventListener('submit', async functi
     return;
   }
   
+  // 3. Jika perempuan (akhwat), buat juga data akhwat untuk koordinator akhwat
+  if(gender === 'Perempuan') {
+    const akhwatResult = await window.dataSdk.create({
+      type: 'akhwat_record',
+      name: name,
+      email: email,
+      phone: phone,
+      status: 'Menunggu', // Akan aktif setelah approval
+      joined_date: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    });
+    
+    if(!akhwatResult.isOk) {
+      console.warn('⚠️ Data akhwat gagal dibuat, tapi registrasi akun tetap berhasil');
+    }
+  }
+  
   // Kedua-duanya berhasil
   toast('✓ Pendaftaran berhasil! Data Anda sudah masuk ke database anggota. Tunggu approval dari admin.');
   setTimeout(() => showLoginPanel(), 2500);
@@ -965,6 +1063,253 @@ document.getElementById('feedback-form').addEventListener('submit', async functi
 function doLogout() {
   APP.currentUser = null;
   showPublicLanding();
+}
+
+function showChangePasswordAdmin() {
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 z-50 flex items-center justify-center modal-backdrop';
+  modal.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full animate-fade border border-smoke-200 mx-4">
+      <h2 class="text-lg font-bold text-emerald-900 mb-4">🔐 Ganti Password</h2>
+      <form id="change-pass-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-2">Password Lama</label>
+          <div class="relative">
+            <input id="old-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm pr-10" placeholder="Masukkan password saat ini" required>
+            <button type="button" onclick="togglePasswordField('old-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <i data-lucide="eye" style="width:16px;height:16px"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-2">Password Baru</label>
+          <div class="relative">
+            <input id="new-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm pr-10" placeholder="Password minimal 6 karakter" required>
+            <button type="button" onclick="togglePasswordField('new-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <i data-lucide="eye" style="width:16px;height:16px"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-2">Konfirmasi Password Baru</label>
+          <div class="relative">
+            <input id="confirm-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm pr-10" placeholder="Ketik ulang password baru" required>
+            <button type="button" onclick="togglePasswordField('confirm-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <i data-lucide="eye" style="width:16px;height:16px"></i>
+            </button>
+          </div>
+        </div>
+        <div id="change-pass-error" class="text-red-500 text-xs hidden"></div>
+        <div id="change-pass-success" class="text-emerald-600 text-xs hidden"></div>
+        <div class="flex gap-2 pt-4">
+          <button type="button" onclick="this.closest('div').parentElement.remove(); lucide.createIcons({nameAttr:'data-lucide'})" class="flex-1 px-4 py-2.5 bg-smoke-200 text-gray-700 rounded-lg font-semibold text-sm hover:bg-smoke-300 transition">Batal</button>
+          <button type="submit" class="flex-1 px-4 py-2.5 bg-emerald-900 text-white rounded-lg font-semibold text-sm hover:bg-emerald-800 transition">Ganti Password</button>
+        </div>
+      </form>
+    </div>`;
+  
+  document.body.appendChild(modal);
+  
+  document.getElementById('change-pass-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const errEl = document.getElementById('change-pass-error');
+    const sucEl = document.getElementById('change-pass-success');
+    
+    const oldPass = document.getElementById('old-pass').value;
+    const newPass = document.getElementById('new-pass').value;
+    const confirmPass = document.getElementById('confirm-pass').value;
+    
+    errEl.classList.add('hidden');
+    sucEl.classList.add('hidden');
+    
+    // Validasi password
+    if(newPass.length < 6) {
+      errEl.textContent = '❌ Password baru minimal 6 karakter';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    
+    if(newPass !== confirmPass) {
+      errEl.textContent = '❌ Konfirmasi password tidak cocok';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    
+    if(oldPass === newPass) {
+      errEl.textContent = '❌ Password baru tidak boleh sama dengan password lama';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    
+    // Cek password lama
+    const pengurus = APP.allData.find(p => p.type === 'pengurus' && p.name === APP.currentUser.username && p.password === oldPass);
+    const isDefaultAdmin = APP.currentUser.username === 'admin' && oldPass === 'admin123';
+    
+    if(!pengurus && !isDefaultAdmin) {
+      errEl.textContent = '❌ Password lama tidak sesuai';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Mengubah...';
+    
+    // Update password
+    if(pengurus) {
+      const r = await window.dataSdk.update({
+        ...pengurus,
+        password: newPass
+      });
+      
+      if(r.isOk) {
+        sucEl.textContent = '✓ Password berhasil diubah! Silakan login kembali.';
+        sucEl.classList.remove('hidden');
+        setTimeout(() => {
+          modal.remove();
+          doLogout();
+        }, 2000);
+      } else {
+        errEl.textContent = '❌ Gagal mengubah password';
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Ganti Password';
+      }
+    } else {
+      // Default admin tidak bisa diubah via SDK, hanya notifikasi
+      sucEl.textContent = '⚠️ Akun default admin - hubungi sistem administrator untuk mengubah password';
+      sucEl.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Ganti Password';
+    }
+  });
+  
+  lucide.createIcons({nameAttr:'data-lucide'});
+}
+
+function togglePasswordField(fieldId) {
+  const input = document.getElementById(fieldId);
+  const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+  input.setAttribute('type', type);
+}
+
+function showMemberChangePassword() {
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 z-50 flex items-center justify-center modal-backdrop';
+  modal.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full animate-fade border border-smoke-200 mx-4">
+      <h2 class="text-lg font-bold text-emerald-900 mb-4">🔐 Ganti Password Akun Anda</h2>
+      <form id="member-change-pass-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-2">Password Lama</label>
+          <div class="relative">
+            <input id="member-old-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm pr-10" placeholder="Masukkan password saat ini" required>
+            <button type="button" onclick="togglePasswordField('member-old-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <i data-lucide="eye" style="width:16px;height:16px"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-2">Password Baru</label>
+          <div class="relative">
+            <input id="member-new-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm pr-10" placeholder="Password minimal 6 karakter" required>
+            <button type="button" onclick="togglePasswordField('member-new-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <i data-lucide="eye" style="width:16px;height:16px"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-2">Konfirmasi Password Baru</label>
+          <div class="relative">
+            <input id="member-confirm-pass" type="password" class="w-full border border-smoke-300 rounded-lg px-3 py-2.5 text-sm pr-10" placeholder="Ketik ulang password baru" required>
+            <button type="button" onclick="togglePasswordField('member-confirm-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <i data-lucide="eye" style="width:16px;height:16px"></i>
+            </button>
+          </div>
+        </div>
+        <div id="member-change-pass-error" class="text-red-500 text-xs hidden"></div>
+        <div id="member-change-pass-success" class="text-emerald-600 text-xs hidden"></div>
+        <div class="flex gap-2 pt-4">
+          <button type="button" onclick="this.closest('div').parentElement.remove(); lucide.createIcons({nameAttr:'data-lucide'})" class="flex-1 px-4 py-2.5 bg-smoke-200 text-gray-700 rounded-lg font-semibold text-sm hover:bg-smoke-300 transition">Batal</button>
+          <button type="submit" class="flex-1 px-4 py-2.5 bg-emerald-900 text-white rounded-lg font-semibold text-sm hover:bg-emerald-800 transition">Ganti Password</button>
+        </div>
+      </form>
+    </div>`;
+  
+  document.body.appendChild(modal);
+  
+  document.getElementById('member-change-pass-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const errEl = document.getElementById('member-change-pass-error');
+    const sucEl = document.getElementById('member-change-pass-success');
+    
+    const oldPass = document.getElementById('member-old-pass').value;
+    const newPass = document.getElementById('member-new-pass').value;
+    const confirmPass = document.getElementById('member-confirm-pass').value;
+    
+    errEl.classList.add('hidden');
+    sucEl.classList.add('hidden');
+    
+    if(newPass.length < 6) {
+      errEl.textContent = '❌ Password baru minimal 6 karakter';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    
+    if(newPass !== confirmPass) {
+      errEl.textContent = '❌ Konfirmasi password tidak cocok';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    
+    if(oldPass === newPass) {
+      errEl.textContent = '❌ Password baru tidak boleh sama dengan password lama';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    
+    const memberAccount = APP.allData.find(a => a.type === 'member_account' && a.email === APP.currentUser.email && a.password === oldPass);
+    
+    if(!memberAccount) {
+      errEl.textContent = '❌ Password lama tidak sesuai';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Mengubah...';
+    
+    const r = await window.dataSdk.update({
+      ...memberAccount,
+      password: newPass
+    });
+    
+    if(r.isOk) {
+      sucEl.textContent = '✓ Password berhasil diubah! Silakan login kembali.';
+      sucEl.classList.remove('hidden');
+      setTimeout(() => {
+        modal.remove();
+        doLogoutMember();
+      }, 2000);
+    } else {
+      errEl.textContent = '❌ Gagal mengubah password';
+      errEl.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Ganti Password';
+    }
+  });
+  
+  lucide.createIcons({nameAttr:'data-lucide'});
+}
+
+function refreshPage() {
+  const currentPage = APP.currentPage;
+  toast('🔄 Memuat ulang halaman...');
+  setTimeout(() => {
+    renderPage(currentPage);
+    lucide.createIcons({nameAttr:'data-lucide'});
+  }, 500);
 }
 
 function doLogoutMember() {
@@ -1178,28 +1523,136 @@ function renderMemberAttendance(el) {
   const myAttendance = APP.allData.filter(a => a.type === 'attendance' && a.attendee === memberName);
   
   el.innerHTML = `
-    <h3 class="font-bold text-emerald-900 text-lg mb-4">✅ Riwayat Absensi Anda</h3>
+    <h3 class="font-bold text-emerald-900 text-lg mb-4">✅ Rekap Absensi Anda</h3>
+    
+    <div class="flex gap-2 mb-6 border-b border-smoke-200 overflow-x-auto">
+      <button onclick="switchMyAttendanceTab('list')" class="px-4 py-2 text-sm font-semibold text-emerald-900 border-b-3 border-emerald-900 whitespace-nowrap" data-tab="list">📋 Daftar</button>
+      <button onclick="switchMyAttendanceTab('summary')" class="px-4 py-2 text-sm font-medium text-gray-600 whitespace-nowrap" data-tab="summary">📊 Ringkasan</button>
+      <button onclick="switchMyAttendanceTab('monthly')" class="px-4 py-2 text-sm font-medium text-gray-600 whitespace-nowrap" data-tab="monthly">📅 Per Bulan</button>
+    </div>
+    
     <button onclick="requestAttendanceForm()" class="mb-4 px-4 py-2 bg-emerald-900 text-white rounded-lg text-sm font-semibold hover:bg-emerald-800 flex items-center gap-1.5">
       <i data-lucide="plus" style="width:14px;height:14px"></i> Absen
     </button>
+    
     <div id="member-attendance-form-area"></div>
-    <div class="space-y-3">
-      ${myAttendance.length === 0 ? '<div class="bg-white rounded-xl p-8 border border-smoke-200 text-center text-gray-400">Belum ada riwayat absensi.</div>' :
-        myAttendance.map(a => `
-        <div class="bg-white rounded-xl p-4 border border-smoke-200">
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <h4 class="font-semibold text-emerald-900 text-sm">${a.event_name || ''}</h4>
-              <p class="text-xs text-gray-500 mt-0.5">${a.date || ''}</p>
-            </div>
-            <span class="px-2 py-1 text-xs rounded-full font-semibold ${a.verified ? 'bg-emerald-100 text-emerald-800' : 'bg-yellow-100 text-yellow-800'}">
-              ${a.verified ? '✓ Terverifikasi' : '⏳ Menunggu Verifikasi'}
-            </span>
-          </div>
-        </div>`).join('')}
-    </div>
-  `;
+    <div id="member-attendance-content"></div>`;
+  
+  switchMyAttendanceTab('list');
   lucide.createIcons({nameAttr:'data-lucide'});
+}
+
+function switchMyAttendanceTab(tab) {
+  const currentMemberAccount = APP.allData.find(a => a.type === 'member_account' && a.email === APP.currentUser.email);
+  const memberName = currentMemberAccount?.name || APP.currentUser.name;
+  const myAttendance = APP.allData.filter(a => a.type === 'attendance' && a.attendee === memberName);
+  
+  const contentEl = document.getElementById('member-attendance-content');
+  
+  if(tab === 'list') {
+    contentEl.innerHTML = `
+      <div class="space-y-3">
+        ${myAttendance.length === 0 ? '<div class="bg-white rounded-xl p-8 border border-smoke-200 text-center text-gray-400">Belum ada riwayat absensi.</div>' :
+          myAttendance.map(a => `
+          <div class="bg-white rounded-xl p-4 border border-smoke-200">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <h4 class="font-semibold text-emerald-900 text-sm">${a.event_name || ''}</h4>
+                <p class="text-xs text-gray-500 mt-0.5">${a.date || ''}</p>
+              </div>
+              <span class="px-2 py-1 text-xs rounded-full font-semibold ${a.verified ? 'bg-emerald-100 text-emerald-800' : 'bg-yellow-100 text-yellow-800'}">
+                ${a.verified ? '✓ Terverifikasi' : '⏳ Menunggu Verifikasi'}
+              </span>
+            </div>
+          </div>`).join('')}
+      </div>`;
+  }
+  
+  else if(tab === 'summary') {
+    const verified = myAttendance.filter(a => a.verified).length;
+    const unverified = myAttendance.filter(a => !a.verified).length;
+    const totalAttendance = myAttendance.length;
+    
+    // Group by event
+    const byEvent = {};
+    myAttendance.forEach(a => {
+      if(!byEvent[a.event_name]) byEvent[a.event_name] = 0;
+      byEvent[a.event_name]++;
+    });
+    
+    contentEl.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="stat-card rounded-xl p-4 text-white">
+          <p class="text-xs opacity-80">Total Absensi</p>
+          <p class="text-3xl font-bold mt-1">${totalAttendance}</p>
+        </div>
+        <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
+          <p class="text-xs text-emerald-600 font-medium">Terverifikasi</p>
+          <p class="text-3xl font-bold text-emerald-900 mt-1">${verified}</p>
+        </div>
+        <div class="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
+          <p class="text-xs text-yellow-600 font-medium">Menunggu Verifikasi</p>
+          <p class="text-3xl font-bold text-yellow-900 mt-1">${unverified}</p>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-xl p-5 border border-smoke-200">
+        <h4 class="font-semibold text-emerald-900 mb-4">📈 Riwayat Absensi per Kegiatan</h4>
+        <div class="space-y-2">
+          ${Object.entries(byEvent).map(([event, count]) => `
+          <div class="flex items-center justify-between p-3 bg-smoke-50 rounded-lg border border-smoke-200">
+            <span class="text-sm font-medium text-gray-800">${event || 'Kegiatan'}</span>
+            <span class="px-3 py-1 text-sm font-bold rounded-full bg-emerald-100 text-emerald-800">${count}x</span>
+          </div>`).join('')}
+        </div>
+      </div>`;
+  }
+  
+  else if(tab === 'monthly') {
+    // Group by month
+    const byMonth = {};
+    myAttendance.forEach(a => {
+      const date = new Date(a.date);
+      const monthKey = date.toISOString().substring(0, 7); // YYYY-MM
+      if(!byMonth[monthKey]) byMonth[monthKey] = [];
+      byMonth[monthKey].push(a);
+    });
+    
+    const sortedMonths = Object.keys(byMonth).sort().reverse();
+    
+    contentEl.innerHTML = `
+      <div class="space-y-4">
+        ${sortedMonths.length === 0 ? '<div class="bg-white rounded-xl p-8 border border-smoke-200 text-center text-gray-400">Belum ada data absensi.</div>' :
+          sortedMonths.map(monthKey => {
+            const monthAttendance = byMonth[monthKey];
+            const [year, month] = monthKey.split('-');
+            const monthDate = new Date(year, month - 1, 1);
+            const verified = monthAttendance.filter(a => a.verified).length;
+            const unverified = monthAttendance.length - verified;
+            
+            return `
+            <div class="bg-white rounded-xl p-5 border border-smoke-200">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="font-bold text-emerald-900">📅 ${monthDate.toLocaleDateString('id-ID', {month: 'long', year: 'numeric'})}</h4>
+                <div class="flex gap-2 text-sm">
+                  <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-xs">✓ ${verified}</span>
+                  <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-semibold text-xs">⏳ ${unverified}</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
+                  <p class="text-xs text-emerald-600 font-medium">Total Absensi</p>
+                  <p class="text-2xl font-bold text-emerald-900 mt-1">${monthAttendance.length}</p>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                  <p class="text-xs text-blue-600 font-medium">Tingkat Verifikasi</p>
+                  <p class="text-2xl font-bold text-blue-900 mt-1">${monthAttendance.length > 0 ? Math.round((verified/monthAttendance.length)*100) : 0}%</p>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+      </div>`;
+  }
 }
 
 function requestAttendanceForm() {
@@ -1383,6 +1836,7 @@ function renderPage(page) {
   switch(page) {
     case 'dashboard': renderDashboard(mc); break;
     case 'statistics': renderStatistics(mc); break;
+    case 'attendance-report': renderAttendanceReport(mc); break;
     case 'settings': renderSettings(mc); break;
     case 'about': renderAbout(mc); break;
     case 'divisions': renderDivisions(mc); break;
@@ -2432,10 +2886,18 @@ async function rejectAttendance(id) {
 
 function showAttendanceForm() {
   const members = getDataByType('member');
+  const pengurus = getDataByType('pengurus');
+  
+  // Gabungkan pengurus dan anggota, dengan label untuk membedakan
+  const allPersons = [
+    ...pengurus.map(p => ({ name: p.name, type: 'Pengurus' })),
+    ...members.map(m => ({ name: m.name, type: 'Anggota' }))
+  ].sort((a, b) => a.name.localeCompare(b.name));
+  
   document.getElementById('attendance-form-area').innerHTML = `
     <form id="add-att-form" class="bg-white rounded-xl p-5 border border-smoke-200 mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
       <div><label class="block text-xs font-medium text-gray-600 mb-1">Nama</label>
-        <select id="att-name" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option>-- Pilih --</option>${members.map(m=>`<option>${m.name}</option>`).join('')}</select>
+        <select id="att-name" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option>-- Pilih --</option>${allPersons.map(p=>`<option value="${p.name}">${p.name} (${p.type})</option>`).join('')}</select>
       </div>
       <div><label class="block text-xs font-medium text-gray-600 mb-1">Kegiatan</label><input id="att-event" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required></div>
       <div class="flex items-end gap-2"><button type="submit" class="px-4 py-2 text-sm bg-emerald-900 text-white rounded-lg font-semibold hover:bg-emerald-800">Simpan</button></div>
@@ -3271,7 +3733,203 @@ async function deleteLetter(id) {
   });
 }
 function renderNotulensi(el) { el.innerHTML = '<div class="bg-white rounded-xl p-8 border border-smoke-200 text-center text-gray-500">Notulensi rapat</div>'; }
-function renderAkhwat(el) { el.innerHTML = '<div class="bg-white rounded-xl p-8 border border-smoke-200 text-center text-gray-500">Data akhwat</div>'; }
+function renderAkhwat(el) {
+  const canManage = ['admin', 'koor_akhwat', 'wakil_koor_akhwat'].includes(APP.currentUser.role);
+  if(!canManage) {
+    el.innerHTML = '<div class="bg-red-50 border border-red-200 rounded-xl p-6"><p class="text-red-700 font-semibold">🔒 Akses Ditolak. Hanya koordinator akhwat.</p></div>';
+    return;
+  }
+  
+  // Ambil dari akhwat_record (data otomatis) + member yang gender perempuan
+  const akhwatRecords = getDataByType('akhwat_record');
+  const femaleMembers = getDataByType('member').filter(m => m.gender === 'Perempuan');
+  
+  // Gabung data akhwat_record dengan member perempuan
+  const combinedAkhwat = [];
+  
+  // Tambah dari akhwat_record
+  akhwatRecords.forEach(ar => {
+    combinedAkhwat.push({
+      ...ar,
+      source: 'akhwat_record'
+    });
+  });
+  
+  // Tambah member perempuan yang belum ada di akhwat_record
+  femaleMembers.forEach(fm => {
+    const exists = akhwatRecords.find(ar => ar.email === fm.email);
+    if(!exists) {
+      combinedAkhwat.push({
+        ...fm,
+        source: 'member'
+      });
+    }
+  });
+  
+  el.innerHTML = `
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="font-bold text-emerald-900">👩 Data Akhwat (${combinedAkhwat.length})</h3>
+        <p class="text-xs text-gray-500 mt-1">Data otomatis terbuat saat pendaftaran akun perempuan baru</p>
+      </div>
+      <button onclick="showAkhwatForm()" class="px-4 py-2 bg-emerald-900 text-white rounded-lg text-sm font-semibold hover:bg-emerald-800 flex items-center gap-1.5">
+        <i data-lucide="plus" style="width:14px;height:14px"></i> Tambah Manual
+      </button>
+    </div>
+    <div id="akhwat-form-area"></div>
+    
+    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4">
+      <p class="text-xs text-emerald-700"><strong>ℹ️ Catatan:</strong> Data akhwat otomatis terbuat ketika ada anggota baru dengan gender perempuan. Koordinator akhwat dapat mengedit atau menambah data manual jika diperlukan.</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      ${combinedAkhwat.length === 0 ? '<div class="col-span-2 bg-white rounded-xl p-8 border border-smoke-200 text-center text-gray-400">📭 Belum ada data akhwat.</div>' :
+        combinedAkhwat.map(a => `
+        <div class="bg-white rounded-xl p-5 border border-smoke-200 card-hover">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex-1">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center text-white font-bold text-lg mb-2">
+                ${(a.name || '?').charAt(0).toUpperCase()}
+              </div>
+              <h4 class="font-semibold text-emerald-900">${a.name || ''}</h4>
+              <p class="text-xs text-gray-500 mt-1">📱 ${a.phone || '-'}</p>
+              <p class="text-xs text-gray-500">📧 ${a.email || '-'}</p>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="showEditAkhwatForm('${a.__backendId}', '${a.source}')" class="w-8 h-8 rounded-lg hover:bg-emerald-100 flex items-center justify-center text-emerald-600 transition">
+                <i data-lucide="pencil" style="width:16px;height:16px"></i>
+              </button>
+              <button onclick="deleteAkhwat('${a.__backendId}', '${a.source}')" class="w-8 h-8 rounded-lg hover:bg-red-100 flex items-center justify-center text-red-600 transition">
+                <i data-lucide="trash-2" style="width:16px;height:16px"></i>
+              </button>
+            </div>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div><span class="text-gray-500">Sekolah:</span> <span class="text-gray-800 font-medium">${a.school || '-'}</span></div>
+            <div><span class="text-gray-500">Keahlian:</span> <span class="text-gray-800 font-medium">${a.skill || '-'}</span></div>
+            <div><span class="text-gray-500">Status:</span> <span class="px-2 py-0.5 rounded-full text-xs ${a.status === 'Aktif' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'}">${a.status || 'Aktif'}</span></div>
+            <div><span class="text-gray-500">Sumber:</span> <span class="text-[10px] px-2 py-0.5 rounded-full ${a.source === 'akhwat_record' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}">${a.source === 'akhwat_record' ? '🔄 Otomatis' : '➕ Manual'}</span></div>
+            <div><span class="text-gray-500">Bergabung:</span> <span class="text-gray-800 font-medium">${a.joined_date ? new Date(a.joined_date).toLocaleDateString('id-ID') : '-'}</span></div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  lucide.createIcons({nameAttr:'data-lucide'});
+}
+
+function showAkhwatForm() {
+  document.getElementById('akhwat-form-area').innerHTML = `
+    <form id="add-akhwat-form" class="bg-white rounded-xl p-5 border border-smoke-200 mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Nama Lengkap</label><input id="akh-name" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">No. HP</label><input id="akh-phone" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Email</label><input id="akh-email" type="email" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Sekolah/Pekerjaan</label><input id="akh-school" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Keahlian</label><input id="akh-skill" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Desain, Public speaking, dll"></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Status</label><select id="akh-status" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option>Aktif</option><option>Nonaktif</option></select></div>
+      <div class="md:col-span-2 flex gap-2 justify-end"><button type="button" onclick="document.getElementById('akhwat-form-area').innerHTML=''" class="px-4 py-2 text-sm bg-smoke-200 rounded-lg">Batal</button><button type="submit" class="px-4 py-2 text-sm bg-emerald-900 text-white rounded-lg font-semibold hover:bg-emerald-800">Simpan</button></div>
+    </form>`;
+  
+  document.getElementById('add-akhwat-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if(APP.allData.length >= 999) { toast('Batas data tercapai','error'); return; }
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan...';
+    
+    const r = await window.dataSdk.create({
+      type: 'member',
+      name: document.getElementById('akh-name').value,
+      phone: document.getElementById('akh-phone').value,
+      email: document.getElementById('akh-email').value,
+      gender: 'Perempuan',
+      school: document.getElementById('akh-school').value,
+      skill: document.getElementById('akh-skill').value,
+      status: document.getElementById('akh-status').value,
+      joined_date: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    });
+    
+    if(r.isOk) {
+      toast('✓ Data akhwat berhasil ditambahkan');
+      document.getElementById('akhwat-form-area').innerHTML = '';
+    } else {
+      toast('Gagal menyimpan','error');
+      btn.disabled = false;
+      btn.textContent = 'Simpan';
+    }
+  });
+  lucide.createIcons({nameAttr:'data-lucide'});
+}
+
+function showEditAkhwatForm(recordId, source) {
+  const record = APP.allData.find(d => d.__backendId === recordId && d.type === (source === 'akhwat_record' ? 'akhwat_record' : 'member'));
+  if(!record) { toast('❌ Data tidak ditemukan','error'); return; }
+  
+  document.getElementById('akhwat-form-area').innerHTML = `
+    <form id="edit-akhwat-form" class="bg-white rounded-xl p-5 border border-smoke-200 mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Nama Lengkap</label><input id="akh-edit-name" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" value="${(member.name||'').replace(/"/g,'&quot;')}" required></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">No. HP</label><input id="akh-edit-phone" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" value="${(member.phone||'').replace(/"/g,'&quot;')}"></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Email</label><input id="akh-edit-email" type="email" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" value="${(member.email||'').replace(/"/g,'&quot;')}"></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Sekolah/Pekerjaan</label><input id="akh-edit-school" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" value="${(member.school||'').replace(/"/g,'&quot;')}"></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Keahlian</label><input id="akh-edit-skill" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" value="${(member.skill||'').replace(/"/g,'&quot;')}"></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Status</label><select id="akh-edit-status" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option ${member.status==='Aktif'?'selected':''}>Aktif</option><option ${member.status==='Nonaktif'?'selected':''}>Nonaktif</option></select></div>
+      <div class="md:col-span-2 flex gap-2 justify-end"><button type="button" onclick="document.getElementById('akhwat-form-area').innerHTML=''" class="px-4 py-2 text-sm bg-smoke-200 rounded-lg">Batal</button><button type="submit" class="px-4 py-2 text-sm bg-emerald-900 text-white rounded-lg font-semibold hover:bg-emerald-800">Simpan Perubahan</button></div>
+    </form>`;
+  
+  document.getElementById('edit-akhwat-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    try {
+      const btn = this.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = 'Menyimpan...';
+      
+      const r = await window.dataSdk.update({
+        ...member,
+        name: document.getElementById('akh-edit-name').value,
+        phone: document.getElementById('akh-edit-phone').value,
+        email: document.getElementById('akh-edit-email').value,
+        school: document.getElementById('akh-edit-school').value,
+        skill: document.getElementById('akh-edit-skill').value,
+        status: document.getElementById('akh-edit-status').value
+      });
+      
+      if(r && r.isOk) {
+        toast('✓ Data akhwat berhasil diperbarui');
+        document.getElementById('akhwat-form-area').innerHTML = '';
+        renderAkhwat(document.getElementById('main-content'));
+      } else {
+        toast('❌ Gagal menyimpan data akhwat','error');
+        btn.disabled = false;
+        btn.textContent = 'Simpan Perubahan';
+      }
+    } catch(err) {
+      console.error('Edit akhwat error:', err);
+      toast('❌ Terjadi kesalahan','error');
+      btn.disabled = false;
+      btn.textContent = 'Simpan Perubahan';
+    }
+  });
+  lucide.createIcons({nameAttr:'data-lucide'});
+}
+
+async function deleteAkhwat(recordId, source) {
+  const record = APP.allData.find(d => d.__backendId === recordId && d.type === (source === 'akhwat_record' ? 'akhwat_record' : 'member'));
+  if(!record) { toast('❌ Data tidak ditemukan','error'); return; }
+  
+  showConfirm(`Hapus data "${record.name}"?`, async () => {
+    try {
+      const r = await window.dataSdk.delete(record);
+      if(r.isOk) {
+        toast('✓ Data akhwat dihapus');
+        setTimeout(() => renderAkhwat(document.getElementById('main-content')), 800);
+      } else {
+        toast('❌ Gagal menghapus data akhwat','error');
+      }
+    } catch(err) {
+      console.error('Delete error:', err);
+      toast('❌ Terjadi kesalahan','error');
+    }
+  });
+}
 function renderDivisionProgress(el) {
   const isKepalaDiv = APP.currentUser.role === 'kepala_divisi';
   const isAdmin = APP.currentUser.role === 'admin';
@@ -4216,15 +4874,23 @@ function renderStatistics(el) {
 
 function renderAttendanceManual(el) {
   const members = getDataByType('member');
+  const pengurus = getDataByType('pengurus');
+  
+  // Gabungkan pengurus dan anggota
+  const allPersons = [
+    ...pengurus.map(p => ({ name: p.name, type: 'Pengurus' })),
+    ...members.map(m => ({ name: m.name, type: 'Anggota' }))
+  ].sort((a, b) => a.name.localeCompare(b.name));
+  
   el.innerHTML = `
     <div class="flex items-center justify-between mb-4">
       <h3 class="font-bold text-emerald-900">Input Presensi Manual</h3>
     </div>
     <form id="attendance-manual-form" class="bg-white rounded-xl p-5 border border-smoke-200 mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-      <div><label class="block text-xs font-medium text-gray-600 mb-1">Pilih Anggota</label>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Pilih Pengurus / Anggota</label>
         <select id="manual-att-member" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required>
           <option>-- Pilih --</option>
-          ${members.map(m=>`<option value="${m.name}">${m.name}</option>`).join('')}
+          ${allPersons.map(p=>`<option value="${p.name}">${p.name} (${p.type})</option>`).join('')}
         </select>
       </div>
       <div><label class="block text-xs font-medium text-gray-600 mb-1">Kegiatan</label><input id="manual-att-event" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required></div>
@@ -4797,6 +5463,289 @@ function renderBroadcastPengurus(el) {
   `;
 }
 
+function renderAttendanceReport(el) {
+  const canView = ['admin', 'sekjen', 'sekretaris_umum', 'ketua_umum'].includes(APP.currentUser.role);
+  if(!canView) {
+    el.innerHTML = '<div class="bg-red-50 border border-red-200 rounded-xl p-6"><p class="text-red-700 font-semibold">🔒 Akses Ditolak. Hanya admin, sekjen, dan ketua umum.</p></div>';
+    return;
+  }
+  
+  const attendance = getDataByType('attendance');
+  const members = getDataByType('member');
+  
+  el.innerHTML = `
+    <h3 class="font-bold text-emerald-900 text-lg mb-4">📊 Rekap Absensi Seluruh Pengurus & Anggota</h3>
+    
+    <div class="flex gap-2 mb-6 border-b border-smoke-200 overflow-x-auto">
+      <button onclick="switchAttendanceReportTab('table')" class="px-4 py-2 text-sm font-semibold text-emerald-900 border-b-3 border-emerald-900 whitespace-nowrap tab-btn" data-tab="table">📋 Tabel Lengkap</button>
+      <button onclick="switchAttendanceReportTab('daily')" class="px-4 py-2 text-sm font-medium text-gray-600 whitespace-nowrap tab-btn" data-tab="daily">📅 Per Hari</button>
+      <button onclick="switchAttendanceReportTab('weekly')" class="px-4 py-2 text-sm font-medium text-gray-600 whitespace-nowrap tab-btn" data-tab="weekly">📆 Per Minggu</button>
+      <button onclick="switchAttendanceReportTab('monthly')" class="px-4 py-2 text-sm font-medium text-gray-600 whitespace-nowrap tab-btn" data-tab="monthly">📅 Per Bulan</button>
+      <button onclick="switchAttendanceReportTab('yearly')" class="px-4 py-2 text-sm font-medium text-gray-600 whitespace-nowrap tab-btn" data-tab="yearly">📊 Per Tahun</button>
+    </div>
+    
+    <div id="attendance-report-content"></div>`;
+  
+  switchAttendanceReportTab('table');
+  lucide.createIcons({nameAttr:'data-lucide'});
+}
+
+function switchAttendanceReportTab(tab) {
+  const attendance = getDataByType('attendance');
+  const members = getDataByType('member');
+  const pengurus = getDataByType('pengurus');
+  
+  const contentEl = document.getElementById('attendance-report-content');
+  
+  if(tab === 'daily') {
+    // Grouping by date
+    const groupedByDate = {};
+    attendance.forEach(a => {
+      if(!groupedByDate[a.date]) groupedByDate[a.date] = [];
+      groupedByDate[a.date].push(a);
+    });
+    
+    const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
+    
+    contentEl.innerHTML = `
+      <div class="space-y-4">
+        ${sortedDates.length === 0 ? '<div class="bg-white rounded-xl p-8 border border-smoke-200 text-center text-gray-400">Belum ada data absensi.</div>' :
+          sortedDates.map(date => {
+            const dayAttendance = groupedByDate[date];
+            const verified = dayAttendance.filter(a => a.verified).length;
+            const unverified = dayAttendance.length - verified;
+            
+            return `
+            <div class="bg-white rounded-xl p-5 border border-smoke-200">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="font-bold text-emerald-900">${new Date(date).toLocaleDateString('id-ID', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}</h4>
+                <div class="flex gap-2 text-sm">
+                  <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-xs">✓ ${verified} Terverifikasi</span>
+                  <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-semibold text-xs">⏳ ${unverified} Menunggu</span>
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs"><thead class="bg-smoke-50"><tr>
+                  <th class="text-left px-3 py-2 font-semibold text-gray-600">Nama</th>
+                  <th class="text-left px-3 py-2 font-semibold text-gray-600">Kegiatan</th>
+                  <th class="text-center px-3 py-2 font-semibold text-gray-600">Status</th>
+                </tr></thead><tbody>
+                  ${dayAttendance.map(a => `<tr class="border-t border-smoke-100">
+                    <td class="px-3 py-2">${a.attendee || ''}</td>
+                    <td class="px-3 py-2 text-gray-600">${a.event_name || ''}</td>
+                    <td class="px-3 py-2 text-center"><span class="text-[10px] px-2 py-0.5 rounded-full ${a.verified ? 'bg-emerald-100 text-emerald-800' : 'bg-yellow-100 text-yellow-800'}">${a.verified ? '✓ Terverifikasi' : '⏳ Menunggu'}</span></td>
+                  </tr>`).join('')}
+                </tbody></table>
+              </div>
+              <p class="text-xs text-gray-500 mt-3 text-center">Total: ${dayAttendance.length} orang</p>
+            </div>`;
+          }).join('')}
+      </div>`;
+  }
+  
+  else if(tab === 'weekly') {
+    // Group by week
+    const groupedByWeek = {};
+    
+    attendance.forEach(a => {
+      const date = new Date(a.date);
+      const weekStart = new Date(date);
+      weekStart.setDate(date.getDate() - date.getDay());
+      const weekKey = weekStart.toISOString().split('T')[0];
+      
+      if(!groupedByWeek[weekKey]) groupedByWeek[weekKey] = [];
+      groupedByWeek[weekKey].push(a);
+    });
+    
+    const sortedWeeks = Object.keys(groupedByWeek).sort().reverse();
+    
+    contentEl.innerHTML = `
+      <div class="space-y-4">
+        ${sortedWeeks.length === 0 ? '<div class="bg-white rounded-xl p-8 border border-smoke-200 text-center text-gray-400">Belum ada data absensi.</div>' :
+          sortedWeeks.map(weekKey => {
+            const weekAttendance = groupedByWeek[weekKey];
+            const weekStart = new Date(weekKey);
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            
+            // Count unique people per day
+            const daysInWeek = {};
+            weekAttendance.forEach(a => {
+              if(!daysInWeek[a.date]) daysInWeek[a.date] = 0;
+              daysInWeek[a.date]++;
+            });
+            
+            const totalPresences = weekAttendance.length;
+            const verified = weekAttendance.filter(a => a.verified).length;
+            const unverified = totalPresences - verified;
+            
+            return `
+            <div class="bg-white rounded-xl p-5 border border-smoke-200">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h4 class="font-bold text-emerald-900">📆 Minggu ${new Date(weekStart).toLocaleDateString('id-ID', {month: 'long', day: 'numeric'})} - ${new Date(weekEnd).toLocaleDateString('id-ID', {month: 'long', day: 'numeric', year: 'numeric'})}</h4>
+                  <p class="text-xs text-gray-500 mt-1">Total: <strong>${totalPresences}</strong> absensi</p>
+                </div>
+                <div class="flex gap-2 text-sm">
+                  <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-xs">✓ ${verified}</span>
+                  <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-semibold text-xs">⏳ ${unverified}</span>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-7 gap-2 text-center">
+                ${['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map((dayName, idx) => {
+                  const day = new Date(weekStart);
+                  day.setDate(weekStart.getDate() + idx);
+                  const dateStr = day.toISOString().split('T')[0];
+                  const count = daysInWeek[dateStr] || 0;
+                  
+                  return `
+                  <div class="bg-smoke-50 rounded-lg p-3">
+                    <p class="text-xs font-semibold text-gray-600">${dayName}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">${day.getDate()}</p>
+                    <p class="text-sm font-bold text-emerald-900 mt-1">${count}</p>
+                  </div>`;
+                }).join('')}
+              </div>
+            </div>`;
+          }).join('')}
+      </div>`;
+  }
+  
+  else if(tab === 'monthly') {
+    // Group by month
+    const groupedByMonth = {};
+    
+    attendance.forEach(a => {
+      const date = new Date(a.date);
+      const monthKey = date.toISOString().substring(0, 7); // YYYY-MM
+      
+      if(!groupedByMonth[monthKey]) groupedByMonth[monthKey] = [];
+      groupedByMonth[monthKey].push(a);
+    });
+    
+    const sortedMonths = Object.keys(groupedByMonth).sort().reverse();
+    
+    contentEl.innerHTML = `
+      <div class="space-y-4">
+        ${sortedMonths.length === 0 ? '<div class="bg-white rounded-xl p-8 border border-smoke-200 text-center text-gray-400">Belum ada data absensi.</div>' :
+          sortedMonths.map(monthKey => {
+            const monthAttendance = groupedByMonth[monthKey];
+            const [year, month] = monthKey.split('-');
+            const monthDate = new Date(year, month - 1, 1);
+            
+            const verified = monthAttendance.filter(a => a.verified).length;
+            const unverified = monthAttendance.length - verified;
+            const uniqueDates = new Set(monthAttendance.map(a => a.date)).size;
+            
+            return `
+            <div class="bg-white rounded-xl p-5 border border-smoke-200">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h4 class="font-bold text-emerald-900">📅 ${monthDate.toLocaleDateString('id-ID', {month: 'long', year: 'numeric'})}</h4>
+                  <p class="text-xs text-gray-500 mt-1">Total: <strong>${monthAttendance.length}</strong> absensi di <strong>${uniqueDates}</strong> hari</p>
+                </div>
+                <div class="flex gap-2 text-sm">
+                  <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-xs">✓ ${verified}</span>
+                  <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-semibold text-xs">⏳ ${unverified}</span>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-3">
+                <div class="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
+                  <p class="text-xs text-emerald-600 font-medium">Total Absensi</p>
+                  <p class="text-2xl font-bold text-emerald-900 mt-1">${monthAttendance.length}</p>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                  <p class="text-xs text-blue-600 font-medium">Rata-rata per Hari</p>
+                  <p class="text-2xl font-bold text-blue-900 mt-1">${(monthAttendance.length / uniqueDates).toFixed(1)}</p>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+      </div>`;
+  }
+  
+  else if(tab === 'yearly') {
+    // Group by year
+    const groupedByYear = {};
+    
+    attendance.forEach(a => {
+      const date = new Date(a.date);
+      const year = date.getFullYear().toString();
+      
+      if(!groupedByYear[year]) groupedByYear[year] = [];
+      groupedByYear[year].push(a);
+    });
+    
+    const sortedYears = Object.keys(groupedByYear).sort().reverse();
+    
+    contentEl.innerHTML = `
+      <div class="space-y-4">
+        ${sortedYears.length === 0 ? '<div class="bg-white rounded-xl p-8 border border-smoke-200 text-center text-gray-400">Belum ada data absensi.</div>' :
+          sortedYears.map(year => {
+            const yearAttendance = groupedByYear[year];
+            
+            // Group by month within year
+            const monthsInYear = {};
+            yearAttendance.forEach(a => {
+              const date = new Date(a.date);
+              const monthKey = (date.getMonth() + 1).toString().padStart(2, '0');
+              if(!monthsInYear[monthKey]) monthsInYear[monthKey] = 0;
+              monthsInYear[monthKey]++;
+            });
+            
+            const verified = yearAttendance.filter(a => a.verified).length;
+            const unverified = yearAttendance.length - verified;
+            const uniqueDates = new Set(yearAttendance.map(a => a.date)).size;
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            
+            return `
+            <div class="bg-white rounded-xl p-5 border border-smoke-200">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h4 class="font-bold text-emerald-900">📊 Tahun ${year}</h4>
+                  <p class="text-xs text-gray-500 mt-1">Total: <strong>${yearAttendance.length}</strong> absensi di <strong>${uniqueDates}</strong> hari</p>
+                </div>
+                <div class="flex gap-2 text-sm">
+                  <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-xs">✓ ${verified}</span>
+                  <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-semibold text-xs">⏳ ${unverified}</span>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-4 gap-2 mb-4">
+                ${monthNames.map((name, idx) => {
+                  const monthNum = (idx + 1).toString().padStart(2, '0');
+                  const count = monthsInYear[monthNum] || 0;
+                  
+                  return `
+                  <div class="bg-${count > 0 ? 'emerald' : 'smoke'}-50 rounded-lg p-2 text-center border border-${count > 0 ? 'emerald' : 'smoke'}-200">
+                    <p class="text-xs font-semibold text-gray-600">${name}</p>
+                    <p class="text-sm font-bold text-${count > 0 ? 'emerald' : 'gray'}-900 mt-1">${count}</p>
+                  </div>`;
+                }).join('')}
+              </div>
+              
+              <div class="grid grid-cols-3 gap-3">
+                <div class="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
+                  <p class="text-xs text-emerald-600 font-medium">Total Absensi</p>
+                  <p class="text-2xl font-bold text-emerald-900 mt-1">${yearAttendance.length}</p>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                  <p class="text-xs text-blue-600 font-medium">Rata-rata per Hari</p>
+                  <p class="text-2xl font-bold text-blue-900 mt-1">${(yearAttendance.length / uniqueDates).toFixed(1)}</p>
+                </div>
+                <div class="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                  <p class="text-xs text-purple-600 font-medium">Hari Aktif</p>
+                  <p class="text-2xl font-bold text-purple-900 mt-1">${uniqueDates}</p>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+      </div>`;
+  }
+}
+
 async function markBroadcastAsReadPengurus(id) {
   const broadcast = APP.allData.find(d => d.__backendId === id && d.type === 'broadcast_received');
   if(!broadcast) return;
@@ -4807,6 +5756,99 @@ async function markBroadcastAsReadPengurus(id) {
   } else {
     toast('Gagal','error');
   }
+}
+
+function filterAttendanceTable() {
+  const searchValue = document.getElementById('table-search').value.toLowerCase();
+  const statusFilter = document.getElementById('table-status-filter').value;
+  const rows = document.querySelectorAll('.attendance-row');
+  
+  rows.forEach(row => {
+    const name = row.dataset.name;
+    const event = row.dataset.event;
+    const verified = row.dataset.verified;
+    
+    const matchesSearch = name.includes(searchValue) || event.includes(searchValue);
+    const matchesStatus = statusFilter === '' || verified === statusFilter;
+    
+    row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+  });
+}
+
+function sortAttendanceTable(column) {
+  const tbody = document.getElementById('attendance-tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  
+  rows.sort((a, b) => {
+    let aValue, bValue;
+    
+    if(column === 'attendee') {
+      aValue = a.children[0].textContent.toLowerCase();
+      bValue = b.children[0].textContent.toLowerCase();
+    } else if(column === 'event') {
+      aValue = a.children[1].textContent.toLowerCase();
+      bValue = b.children[1].textContent.toLowerCase();
+    } else if(column === 'date') {
+      aValue = new Date(a.children[2].textContent);
+      bValue = new Date(b.children[2].textContent);
+    }
+    
+    if(aValue < bValue) return -1;
+    if(aValue > bValue) return 1;
+    return 0;
+  });
+  
+  rows.forEach(row => tbody.appendChild(row));
+}
+
+async function verifyAttendanceFromReport(id) {
+  const rec = APP.allData.find(d => d.__backendId === id && d.type === 'attendance');
+  if(!rec) return;
+  const r = await window.dataSdk.update({...rec, verified: true});
+  if(r.isOk) {
+    toast('✓ Absensi terverifikasi');
+    switchAttendanceReportTab('table');
+  } else {
+    toast('Gagal','error');
+  }
+}
+
+async function rejectAttendanceFromReport(id) {
+  const rec = APP.allData.find(d => d.__backendId === id && d.type === 'attendance');
+  if(!rec) { toast('❌ Data tidak ditemukan','error'); return; }
+  
+  try {
+    const r = await window.dataSdk.delete(rec);
+    if(r.isOk) { 
+      toast('✓ Absensi ditolak dan dihapus');
+      switchAttendanceReportTab('table');
+    } else { 
+      toast('❌ Gagal menghapus absensi','error');
+    }
+  } catch(err) {
+    console.error('Delete error:', err);
+    toast('❌ Terjadi kesalahan','error');
+  }
+}
+
+async function deleteAttendanceRecord(id) {
+  const rec = APP.allData.find(d => d.__backendId === id && d.type === 'attendance');
+  if(!rec) { toast('❌ Data tidak ditemukan','error'); return; }
+  
+  showConfirm(`Hapus absensi "${rec.attendee}" dari "${rec.event_name}"?`, async () => {
+    try {
+      const r = await window.dataSdk.delete(rec);
+      if(r.isOk) { 
+        toast('✓ Absensi dihapus');
+        switchAttendanceReportTab('table');
+      } else { 
+        toast('❌ Gagal menghapus absensi','error');
+      }
+    } catch(err) {
+      console.error('Delete error:', err);
+      toast('❌ Terjadi kesalahan','error');
+    }
+  });
 }
 
 function renderDivisions(el) {
@@ -4981,5 +6023,98 @@ async function deleteDivision(id) {
 
 lucide.createIcons({nameAttr:'data-lucide'});
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ddfbde275168823',t:'MTc3Mzc4OTc2OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9dfe19d364b383e8',t:'MTc3NDEwODEwOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+ <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBr054UFwsVb61YQb6WjSCSTPwpk6fSJnk",
+  authDomain: "rismafweb.firebaseapp.com",
+  projectId: "rismafweb"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// ================= LOGIN ADMIN =================
+document.getElementById("login-form").addEventListener("submit", async function(e){
+  e.preventDefault();
+
+  const email = document.getElementById("login-user").value;
+  const password = document.getElementById("login-pass").value;
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    
+    alert("Login Admin Berhasil!");
+
+    // pindah ke dashboard admin
+    document.getElementById("login-panel").style.display = "none";
+    document.getElementById("admin-panel").style.display = "block";
+
+    document.getElementById("sidebar-username").innerText = email;
+
+  } catch (error) {
+    document.getElementById("login-error").innerText = error.message;
+    document.getElementById("login-error").style.display = "block";
+  }
+});
+</script>
+<script>
+function showLoginPanel() {
+  document.getElementById("public-landing").style.display = "none";
+  document.getElementById("login-panel").style.display = "block";
+}
+
+function showPublicLanding() {
+  document.getElementById("login-panel").style.display = "none";
+  document.getElementById("public-landing").style.display = "block";
+}
+</script>
+<script>
+function navigateTo(page) {
+  const content = document.getElementById("main-content");
+  const title = document.getElementById("page-title");
+
+  if(page === "dashboard"){
+    title.innerText = "Dashboard";
+
+    content.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-4 rounded-xl shadow">
+          <h3 class="text-sm text-gray-500">Total Anggota</h3>
+          <p class="text-2xl font-bold text-emerald-900">0</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow">
+          <h3 class="text-sm text-gray-500">Kegiatan</h3>
+          <p class="text-2xl font-bold text-emerald-900">0</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow">
+          <h3 class="text-sm text-gray-500">Saldo Kas</h3>
+          <p class="text-2xl font-bold text-emerald-900">Rp 0</p>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// default load
+document.addEventListener("DOMContentLoaded", () => {
+  navigateTo("dashboard");
+});
+</script>
+<script>
+function navigateTo(page){
+  const content = document.getElementById("main-content");
+  const title = document.getElementById("page-title");
+
+  title.innerText = page.toUpperCase();
+
+  content.innerHTML = `<p>Halaman ${page}</p>`;
+}
+</script></body>
 </html>
