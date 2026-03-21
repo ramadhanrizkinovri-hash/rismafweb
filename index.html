@@ -197,7 +197,7 @@ if (document.readyState === 'loading') {
       <div class="max-w-6xl mx-auto px-4 py-16 text-center">
        <div class="animate-fade">
         <p class="font-amiri text-2xl text-gold-500 mb-2">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</p>
-        <h2 id="pub-welcome" class="text-4xl font-extrabold text-emerald-900 mb-3">Selamat Pergi di Portal RISMAF</h2>
+        <h2 id="pub-welcome" class="text-4xl font-extrabold text-emerald-900 mb-3">Selamat Datang di Portal RISMAF</h2>
         <p class="text-gray-500 max-w-xl mx-auto">Platform digital untuk Remaja Islam Masjid Al-Falah. Mengelola kegiatan, keuangan, dan keanggotaan secara modern dan transparan.</p>
        </div>
        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12">
@@ -360,7 +360,7 @@ if (document.readyState === 'loading') {
     <footer class="bg-emerald-900 text-white py-8 mt-8">
      <div class="max-w-6xl mx-auto px-4 text-center">
       <p class="font-amiri text-gold-400 text-lg mb-1">RISMAF</p>
-      <p class="text-emerald-300 text-xs">Remaja Islam Masjid Al-Falah © 2025</p>
+      <p class="text-emerald-300 text-xs">Remaja Islam Masjid Al-Falah © 2026</p>
      </div>
     </footer>
    </div>
@@ -3378,7 +3378,7 @@ function showScheduleForm() {
   document.getElementById('schedule-form-area').innerHTML = `
     <form id="add-schedule-form" class="bg-white rounded-xl p-5 border border-smoke-200 mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
       <div><label class="block text-xs font-medium text-gray-600 mb-1">Nama Kegiatan</label><input id="sched-name" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required></div>
-      <div><label class="block text-xs font-medium text-gray-600 mb-1">Tanggal &amp; Jam</label><input id="sched-date" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="15 Jan 2025, 19:00 WIB" required></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Tanggal &amp; Jam</label><input id="sched-date" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="15 Jan 2026, 19:00 WIB" required></div>
       <div class="md:col-span-2"><label class="block text-xs font-medium text-gray-600 mb-1">Deskripsi</label><textarea id="sched-desc" rows="2" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"></textarea></div>
       <div class="md:col-span-2 flex gap-2 justify-end">
         <button type="button" onclick="document.getElementById('schedule-form-area').innerHTML=''" class="px-4 py-2 text-sm bg-smoke-200 rounded-lg">Batal</button>
@@ -3688,7 +3688,7 @@ function renderLetters(el) {
 function showLetterForm() {
   document.getElementById('letter-form-area').innerHTML = `
     <form id="add-letter-form" class="bg-white rounded-xl p-5 border border-smoke-200 mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-      <div><label class="block text-xs font-medium text-gray-600 mb-1">No. Surat</label><input id="letter-no" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Misal: 001/RISMAF/I/2025"></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">No. Surat</label><input id="letter-no" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Misal: 001/RISMAF/I/2026"></div>
       <div><label class="block text-xs font-medium text-gray-600 mb-1">Perihal</label><input id="letter-subject" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required></div>
       <div><label class="block text-xs font-medium text-gray-600 mb-1">Tipe</label><select id="letter-type" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"><option>Masuk</option><option>Keluar</option></select></div>
       <div class="md:col-span-3"><label class="block text-xs font-medium text-gray-600 mb-1">Keterangan</label><textarea id="letter-desc" rows="2" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm"></textarea></div>
@@ -4210,7 +4210,7 @@ function renderMemberCards(el) {
                 <div class="h-0.5 bg-white/20 mb-2"></div>
                 <div class="flex justify-between items-center text-[10px]">
                   <span class="opacity-70">Issued: ${joinDate.toLocaleDateString('id-ID', {year:'numeric', month:'short', day:'numeric'})}</span>
-                  <span class="font-bold">RISMAF 2025</span>
+                  <span class="font-bold">RISMAF 2026</span>
                 </div>
               </div>
             </div>
@@ -4312,7 +4312,7 @@ function showMemberCardDetail(memberId) {
               <div class="h-0.5 bg-white/20 mb-2"></div>
               <div class="flex justify-between items-center text-[10px]">
                 <span class="opacity-70">Issued: ${joinDate.toLocaleDateString('id-ID', {year:'numeric', month:'short', day:'numeric'})}</span>
-                <span class="font-bold">RISMAF 2025</span>
+                <span class="font-bold">RISMAF 2026</span>
               </div>
             </div>
           </div>
@@ -4953,7 +4953,7 @@ function renderNotulensi(el) {
 function showNotulensiForm() {
   document.getElementById('notulensi-form-area').innerHTML = `
     <form id="notulensi-form" class="bg-white rounded-xl p-5 border border-smoke-200 mb-4 space-y-3">
-      <div><label class="block text-xs font-medium text-gray-600 mb-1">Tanggal Rapat</label><input id="notulensi-date" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Contoh: 15 Jan 2025" required></div>
+      <div><label class="block text-xs font-medium text-gray-600 mb-1">Tanggal Rapat</label><input id="notulensi-date" type="text" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" placeholder="Contoh: 15 Jan 2026" required></div>
       <div><label class="block text-xs font-medium text-gray-600 mb-1">Isi Notulensi</label><textarea id="notulensi-content" rows="4" class="w-full border border-smoke-300 rounded-lg px-3 py-2 text-sm" required></textarea></div>
       <div class="flex gap-2 justify-end"><button type="button" onclick="document.getElementById('notulensi-form-area').innerHTML=''" class="px-4 py-2 text-sm bg-smoke-200 rounded-lg">Batal</button><button type="submit" class="px-4 py-2 text-sm bg-emerald-900 text-white rounded-lg font-semibold">Simpan Notulensi</button></div>
     </form>`;
@@ -6116,5 +6116,36 @@ function navigateTo(page){
 
   content.innerHTML = `<p>Halaman ${page}</p>`;
 }
-</script></body>
+</script>
+<div id="login-panel" class="form-card">
+  <h2>Login</h2>
+  <input id="login-email" placeholder="Email" />
+  <input id="login-pass" type="password" placeholder="Password" />
+  <button onclick="loginUser()">Login</button>
+  <p>Belum punya akun? <a href="#" onclick="showRegister()">Daftar di sini</a></p>
+</div>
+
+<div id="register-panel" class="form-card">
+  <h2>Daftar Akun</h2>
+  <input id="reg-name" placeholder="Nama Lengkap" />
+  <input id="reg-email" placeholder="Email" />
+  <input id="reg-pass" type="password" placeholder="Password" />
+  <button onclick="registerUser()">Register</button>
+  <p>Sudah punya akun? <a href="#" onclick="showLogin()">Login di sini</a></p>
+</div>
+<script>
+function showRegister(){
+  document.getElementById("login-panel").style.display = "none";
+  document.getElementById("register-panel").style.display = "block";
+}
+
+function showLogin(){
+  document.getElementById("register-panel").style.display = "none";
+  document.getElementById("login-panel").style.display = "block";
+}
+
+// default tampil login
+showLogin();
+</script>
+</body>
 </html>
