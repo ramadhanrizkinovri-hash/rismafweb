@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="id" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RISMAF - Remaja Islam Masjid Al-Falah</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&amp;family=Amiri:wght@400;700&amp;display=swap" rel="stylesheet">
+  <script>
+tailwind.config={theme:{extend:{colors:{emerald1:'#0d9255',emerald2:'#0a7a47',cream:'#f5f0e8',gold:'#d4a843',darkgreen:'#064e2b'}}}}
+</script>
+  <style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'Nunito',sans-serif;scroll-behavior:smooth}
+.menu-scroll::-webkit-scrollbar{display:none}
+.menu-scroll{-ms-overflow-style:none;scrollbar-width:none}
+.pattern-bg{background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230d9255' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.geo-pattern{background-image:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M40 0L80 40L40 80L0 40z' fill='none' stroke='%23ffffff' stroke-opacity='0.1' stroke-width='1'/%3E%3Ccircle cx='40' cy='40' r='15' fill='none' stroke='%23ffffff' stroke-opacity='0.06'/%3E%3C/g%3E%3C/svg%3E")}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 5px rgba(13,146,85,0.3)}50%{box-shadow:0 0 20px rgba(13,146,85,0.6)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes buttonPulse{0%{box-shadow:0 0 0 0 rgba(13,146,85,0.7)}70%{box-shadow:0 0 0 10px rgba(13,146,85,0)}}
+@keyframes buttonRipple{0%{transform:scale(1);opacity:1}100%{transform:scale(2.5);opacity:0}}
+.fade-up{animation:fadeUp 0.6s ease forwards}
+.float-anim{animation:float 3s ease-in-out infinite}
+.pulse-glow{animation:pulse-glow 2s ease-in-out infinite}
+.slide-in{animation:slideIn 0.4s ease forwards}
+.card-hover{transition:all 0.3s ease}
+.card-hover:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,0.12)}
+.btn-interactive{position:relative;overflow:hidden;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+.btn-interactive:hover{animation:buttonPulse 0.6s ease-out}
+.btn-interactive:active::before{animation:buttonRipple 0.6s ease-out}
+.btn-interactive::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,0.5);transform:translate(-50%,-50%)}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.modal-overlay.active{opacity:1;pointer-events:all}
+.modal-content{background:white;border-radius:16px;max-width:500px;width:90%;max-height:80%;overflow-y:auto;transform:scale(0.9);transition:transform 0.3s}
+.modal-overlay.active .modal-content{transform:scale(1)}
+.nav-active{background:linear-gradient(135deg,#0d9255,#0a7a47);color:white!important;box-shadow:0 4px 15px rgba(13,146,85,0.3)}
+.struct-line{position:relative}
+.struct-line::before{content:'';position:absolute;top:0;left:50%;width:2px;height:20px;background:#0d9255;transform:translateX(-50%)}
+.time-display{font-variant-numeric:tabular-nums}
+.donate-card{background:linear-gradient(135deg,#064e2b 0%,#0d9255 100%)}
+</style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="app" class="w-full h-full overflow-auto bg-cream pattern-bg"><!-- HEADER -->
+   <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-emerald-100">
+    <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between">
+     <div class="flex items-center gap-2"><img src="https://i.ibb.co.com/V0vGSVQW/Rismaf.png" alt="Logo RISMAF" class="w-10 h-10 rounded-full object-cover" loading="lazy" onerror="this.style.background='#0d9255';this.alt='RISMAF';">
+      <div>
+       <h1 class="text-sm font-extrabold text-emerald1 leading-tight" id="header-title">RISMAF</h1>
+       <p class="text-[10px] text-gray-500 leading-tight">Bambu Apus, Jakarta Timur</p>
+      </div>
+     </div>
+     <div class="flex items-center gap-2">
+      <div class="hidden sm:flex flex-col items-end"><span id="clock" class="text-xs font-bold text-emerald1 time-display">--:--:--</span> <span id="date" class="text-[10px] text-gray-500">Loading...</span>
+      </div><a href="https://forms.gle/xNQKqfauwDb5sWPZ9" target="_blank" rel="noopener noreferrer" class="bg-emerald1 hover:bg-emerald2 text-white text-xs font-bold px-3 py-1.5 rounded-full transition-all hover:scale-105 flex items-center gap-1"> <i data-lucide="user-plus" style="width:14px;height:14px"></i> Daftar </a>
+     </div>
+    </div><!-- HORIZONTAL MENU -->
+    <div class="menu-scroll overflow-x-auto border-t border-emerald-50">
+     <div class="flex gap-1 px-4 py-1.5 min-w-max"><button onclick="showSection('beranda')" class="nav-btn nav-active text-xs font-bold px-3 py-1.5 rounded-full transition-all whitespace-nowrap" data-section="beranda">🏠 Beranda</button> <button onclick="showSection('profil')" class="nav-btn text-xs font-bold px-3 py-1.5 rounded-full text-gray-600 hover:bg-emerald-50 transition-all whitespace-nowrap" data-section="profil">📖 Profil</button> <button onclick="showSection('galeri')" class="nav-btn text-xs font-bold px-3 py-1.5 rounded-full text-gray-600 hover:bg-emerald-50 transition-all whitespace-nowrap" data-section="galeri">🎞️ Galeri</button> <button onclick="showSection('struktur')" class="nav-btn text-xs font-bold px-3 py-1.5 rounded-full text-gray-600 hover:bg-emerald-50 transition-all whitespace-nowrap" data-section="struktur">👥 Struktur</button> <button onclick="showSection('pengumuman')" class="nav-btn text-xs font-bold px-3 py-1.5 rounded-full text-gray-600 hover:bg-emerald-50 transition-all whitespace-nowrap" data-section="pengumuman">📢 Pengumuman</button> <button onclick="showSection('jadwal')" class="nav-btn text-xs font-bold px-3 py-1.5 rounded-full text-gray-600 hover:bg-emerald-50 transition-all whitespace-nowrap" data-section="jadwal">📅 Jadwal</button> <button onclick="showSection('donasi')" class="nav-btn text-xs font-bold px-3 py-1.5 rounded-full text-gray-600 hover:bg-emerald-50 transition-all whitespace-nowrap" data-section="donasi">💝 Donasi</button> <a href="https://forms.gle/Fk5yVgtxiPqDqAUaA" target="_blank" rel="noopener noreferrer" class="text-xs font-bold px-3 py-1.5 rounded-full text-gray-600 hover:bg-emerald-50 transition-all whitespace-nowrap">💬 Kotak Saran</a> <a href="https://drive.google.com/file/d/1mgYQ7bafYWiIDGSYM6Z3bMtnk0p8SdRO/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="text-xs font-bold px-3 py-1.5 rounded-full text-gray-600 hover:bg-emerald-50 transition-all whitespace-nowrap">📜 AD/ART</a> <a href="https://sites.google.com/view/adr-rismaf/based" target="_blank" rel="noopener noreferrer" class="text-xs font-bold px-3 py-1.5 rounded-full text-gray-600 hover:bg-emerald-50 transition-all whitespace-nowrap">📘 Adab &amp; Resolusi</a>
+     </div>
+    </div>
+   </header><!-- ========== BERANDA ========== -->
+   <section id="sec-beranda" class="section-page"><!-- HERO -->
+    <div class="geo-pattern bg-gradient-to-br from-darkgreen via-emerald1 to-emerald2 text-white py-12 px-4 text-center relative overflow-hidden">
+     <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-4 left-4 text-6xl">
+       ☪
+      </div>
+      <div class="absolute bottom-4 right-4 text-6xl">
+       🕌
+      </div>
+     </div>
+     <div class="relative z-10 max-w-2xl mx-auto"><img src="https://i.ibb.co.com/V0vGSVQW/Rismaf.png" alt="Logo RISMAF" class="w-20 h-20 rounded-full mx-auto mb-4 border-4 border-white/30 float-anim" loading="lazy" onerror="this.style.background='#064e2b';this.alt='R';">
+      <h2 class="text-2xl sm:text-3xl font-black mb-2 fade-up" id="hero-title">Remaja Islam Masjid Al-Falah</h2>
+      <p class="text-emerald-200 font-semibold text-sm mb-1 fade-up" id="hero-subtitle">RISMAF Bambu Apus</p>
+      <p class="text-emerald-300 text-xs mb-4 italic font-amiri">"Sebaik-baik manusia adalah yang paling bermanfaat bagi manusia lainnya"</p>
+      <div class="sm:hidden mb-4"><span id="clock-mobile" class="text-lg font-bold time-display">--:--:--</span><br><span id="date-mobile" class="text-xs text-emerald-200">Loading...</span>
+      </div>
+      <div class="flex gap-3 justify-center flex-wrap"><a href="https://forms.gle/xNQKqfauwDb5sWPZ9" target="_blank" rel="noopener noreferrer" class="btn-interactive bg-white text-emerald1 font-bold px-5 py-2 rounded-full text-sm hover:scale-105 transition-all inline-flex items-center gap-2 shadow-lg"> <i data-lucide="user-plus" style="width:16px;height:16px"></i> Daftar Sekarang </a> <a href="https://wa.me/6285588746080" target="_blank" rel="noopener noreferrer" class="btn-interactive bg-emerald-600 text-white font-bold px-5 py-2 rounded-full text-sm hover:scale-105 transition-all inline-flex items-center gap-2 border border-white/20"> <i data-lucide="message-circle" style="width:16px;height:16px"></i> Hubungi Kami </a>
+      </div>
+     </div>
+    </div><!-- QUICK SOCIAL -->
+    <div class="max-w-6xl mx-auto px-4 -mt-5 relative z-10 mb-6">
+     <div class="bg-white rounded-2xl shadow-lg p-3 flex justify-center gap-4"><a href="https://instagram.com/rismaf_bambuapus" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-700 transition"> <span class="bg-pink-100 p-1.5 rounded-full"><i data-lucide="instagram" style="width:16px;height:16px"></i></span> Instagram </a> <a href="https://wa.me/6285588746080" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-xs font-bold text-green-600 hover:text-green-700 transition"> <span class="bg-green-100 p-1.5 rounded-full"><i data-lucide="message-circle" style="width:16px;height:16px"></i></span> WhatsApp </a> <a href="mailto:rismafbambuapus@gmail.com" class="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 transition"> <span class="bg-blue-100 p-1.5 rounded-full"><i data-lucide="mail" style="width:16px;height:16px"></i></span> Email </a>
+     </div>
+    </div><!-- BERANDA CONTENT CARDS -->
+    <div class="max-w-6xl mx-auto px-4 pb-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"><!-- Profil Singkat -->
+     <div class="bg-white rounded-2xl shadow-md p-5 card-hover border border-emerald-50">
+      <div class="flex items-center gap-2 mb-3"><span class="text-2xl">🕌</span>
+       <h3 class="font-extrabold text-emerald1 text-sm">Tentang RISMAF</h3>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed mb-3">Organisasi kepemudaan Islam di Masjid Besar Al-Falah, Bambu Apus, Jakarta Timur. Membina generasi muda yang unggul dalam IMTAQ dan IPTEK.</p><button onclick="showSection('profil')" class="text-xs font-bold text-emerald1 hover:underline">Selengkapnya →</button>
+     </div><!-- Visi -->
+     <div class="bg-gradient-to-br from-emerald-50 to-white rounded-2xl shadow-md p-5 card-hover border border-emerald-100">
+      <div class="flex items-center gap-2 mb-3"><span class="text-2xl">🎯</span>
+       <h3 class="font-extrabold text-emerald1 text-sm">Visi Kami</h3>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">Terwujudnya generasi muda Masjid Al-Falah yang unggul dalam IMTAQ, cerdas dalam IPTEK, dan aktif menebar manfaat bagi banyak orang.</p>
+     </div><!-- Pengumuman Terbaru -->
+     <div class="bg-white rounded-2xl shadow-md p-5 card-hover border border-emerald-50">
+      <div class="flex items-center gap-2 mb-3"><span class="text-2xl">📢</span>
+       <h3 class="font-extrabold text-emerald1 text-sm">Pengumuman Terbaru</h3>
+      </div>
+      <div class="space-y-2">
+       <div class="bg-emerald-50 rounded-lg p-2">
+        <p class="text-xs font-bold text-emerald1">Kajian Rutin Pekan Ini</p>
+        <p class="text-[10px] text-gray-500">Tema: Adab Bermedia Sosial</p>
+       </div>
+       <div class="bg-yellow-50 rounded-lg p-2">
+        <p class="text-xs font-bold text-yellow-700">Pendaftaran Anggota Baru</p>
+        <p class="text-[10px] text-gray-500">Periode pendaftaran dibuka!</p>
+       </div>
+      </div><button onclick="showSection('pengumuman')" class="text-xs font-bold text-emerald1 hover:underline mt-2 block">Lihat semua →</button>
+     </div><!-- Jadwal Terdekat -->
+     <div class="bg-white rounded-2xl shadow-md p-5 card-hover border border-emerald-50">
+      <div class="flex items-center gap-2 mb-3"><span class="text-2xl">📅</span>
+       <h3 class="font-extrabold text-emerald1 text-sm">Jadwal Terdekat</h3>
+      </div>
+      <div class="space-y-2">
+       <div class="flex items-center gap-2 bg-blue-50 rounded-lg p-2">
+        <div class="bg-emerald1 text-white text-[10px] font-bold rounded-lg px-2 py-1 text-center leading-tight">
+         <span class="block text-sm">JUM</span>
+        </div>
+        <div>
+         <p class="text-xs font-bold text-gray-800">Kajian Ba'da Maghrib</p>
+         <p class="text-[10px] text-gray-500">18:30 - 20:00 WIB</p>
+        </div>
+       </div>
+       <div class="flex items-center gap-2 bg-purple-50 rounded-lg p-2">
+        <div class="bg-purple-500 text-white text-[10px] font-bold rounded-lg px-2 py-1 text-center leading-tight">
+         <span class="block text-sm">AHD</span>
+        </div>
+        <div>
+         <p class="text-xs font-bold text-gray-800">Bersih-bersih Masjid</p>
+         <p class="text-[10px] text-gray-500">07:00 - 09:00 WIB</p>
+        </div>
+       </div>
+      </div><button onclick="showSection('jadwal')" class="text-xs font-bold text-emerald1 hover:underline mt-2 block">Lihat jadwal →</button>
+     </div><!-- Info Donasi -->
+     <div class="donate-card rounded-2xl shadow-md p-5 card-hover text-white">
+      <div class="flex items-center gap-2 mb-3"><span class="text-2xl">💝</span>
+       <h3 class="font-extrabold text-sm">Donasi &amp; Infaq</h3>
+      </div>
+      <p class="text-xs text-emerald-200 mb-2">Bank Syariah Indonesia</p>
+      <p class="text-lg font-black tracking-wider">7777 999 208</p>
+      <p class="text-xs text-emerald-200">a.n Remaja Islam Masjid Al-Falah</p><button onclick="showSection('donasi')" class="mt-3 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-1.5 rounded-full transition">Detail →</button>
+     </div><!-- Kotak Saran -->
+     <div class="bg-gradient-to-br from-amber-50 to-white rounded-2xl shadow-md p-5 card-hover border border-amber-100">
+      <div class="flex items-center gap-2 mb-3"><span class="text-2xl">💬</span>
+       <h3 class="font-extrabold text-amber-700 text-sm">Kotak Saran</h3>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed mb-3">Sampaikan saran, kritik, dan masukanmu untuk kemajuan RISMAF.</p><a href="https://forms.gle/Fk5yVgtxiPqDqAUaA" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded-full transition"> <i data-lucide="send" style="width:14px;height:14px"></i> Kirim Saran </a>
+     </div>
+    </div>
+   </section><!-- ========== PROFIL ========== -->
+   <section id="sec-profil" class="section-page hidden">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+     <h2 class="text-xl font-black text-emerald1 mb-6 text-center">📖 Profil RISMAF</h2><!-- Sejarah -->
+     <div class="bg-white rounded-2xl shadow-md p-6 mb-4 card-hover border border-emerald-50">
+      <h3 class="font-extrabold text-emerald1 mb-2 flex items-center gap-2"><span class="text-xl">🏛️</span> Sejarah</h3>
+      <p class="text-sm text-gray-600 leading-relaxed">Remaja Islam Masjid Al-Falah (RISMAF) merupakan organisasi kepemudaan Islam yang didirikan dan berkegiatan di lingkungan Masjid Besar Al-Falah, Bambu Apus, Jakarta Timur. RISMAF hadir sebagai wadah bagi para pemuda Muslim untuk mengembangkan potensi diri, memperdalam ilmu agama, serta berkontribusi positif bagi masyarakat sekitar. Dengan semangat ukhuwah Islamiyah, RISMAF terus bergerak untuk mencetak generasi muda yang berakhlak mulia, berwawasan luas, dan peduli terhadap sesama.</p>
+     </div><!-- Visi -->
+     <div class="bg-gradient-to-r from-emerald-50 to-white rounded-2xl shadow-md p-6 mb-4 card-hover border border-emerald-100">
+      <h3 class="font-extrabold text-emerald1 mb-2 flex items-center gap-2"><span class="text-xl">🎯</span> Visi</h3>
+      <p class="text-sm text-gray-600 leading-relaxed">Terwujudnya generasi muda Masjid Al-Falah yang unggul dalam <strong>IMTAQ</strong> (Iman &amp; Taqwa), cerdas dalam <strong>IPTEK</strong> (Ilmu Pengetahuan &amp; Teknologi), dan aktif dalam menebar manfaat bagi banyak orang.</p>
+     </div><!-- Misi -->
+     <div class="bg-white rounded-2xl shadow-md p-6 card-hover border border-emerald-50">
+      <h3 class="font-extrabold text-emerald1 mb-3 flex items-center gap-2"><span class="text-xl">🚀</span> Misi</h3>
+      <div class="space-y-2">
+       <div class="flex items-start gap-2">
+        <span class="bg-emerald1 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">1</span>
+        <p class="text-sm text-gray-600">Menyelenggarakan kajian keislaman yang inovatif, menarik, dan relevan dengan problematika remaja masa kini.</p>
+       </div>
+       <div class="flex items-start gap-2">
+        <span class="bg-emerald1 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">2</span>
+        <p class="text-sm text-gray-600">Membangun literasi digital dan pemanfaatan teknologi informasi sebagai sarana dakwah yang positif serta meningkatkan kompetensi soft skill anggota.</p>
+       </div>
+       <div class="flex items-start gap-2">
+        <span class="bg-emerald1 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">3</span>
+        <p class="text-sm text-gray-600">Menumbuhkan jiwa entrepreneurship dan mengelola unit usaha kreatif yang dapat membuka peluang tambahan penghasilan bagi anggota serta mendukung kemandirian ekonomi organisasi.</p>
+       </div>
+       <div class="flex items-start gap-2">
+        <span class="bg-emerald1 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">4</span>
+        <p class="text-sm text-gray-600">Mewadahi minat olahraga dan seni sebagai sarana penyaluran energi positif, menjaga kesehatan, dan mempererat ukhuwah.</p>
+       </div>
+       <div class="flex items-start gap-2">
+        <span class="bg-emerald1 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">5</span>
+        <p class="text-sm text-gray-600">Menginisiasi gerakan sosial kemanusiaan yang berdampak nyata bagi masyarakat di lingkungan Masjid Besar Al-Falah.</p>
+       </div>
+       <div class="flex items-start gap-2">
+        <span class="bg-emerald1 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">6</span>
+        <p class="text-sm text-gray-600">Mencetak pemimpin masa depan yang memiliki integritas, tanggung jawab, dan jiwa kepemimpinan yang berlandaskan nilai-nilai Islam.</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- ========== GALERI ========== -->
+   <section id="sec-galeri" class="section-page hidden">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+     <h2 class="text-xl font-black text-emerald1 mb-6 text-center">🎞️ Galeri Dokumentasi 2026</h2>
+     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"><!-- Dokumentasi Kegiatan 1 -->
+      <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover border border-emerald-50">
+       <div class="bg-gradient-to-br from-emerald-300 to-emerald-500 h-40 flex items-center justify-center text-5xl">
+        📖
+       </div>
+       <div class="p-4">
+        <h3 class="font-extrabold text-gray-800 text-sm mb-1">Kajian Ba'da Maghrib</h3>
+        <p class="text-xs text-gray-500 mb-2">Setiap Jumat - Januari 2026</p>
+        <p class="text-xs text-gray-600">Dokumentasi kegiatan kajian rutin yang membahas tema-tema relevan bagi remaja Muslim masa kini.</p>
+       </div>
+      </div><!-- Dokumentasi Kegiatan 2 -->
+      <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover border border-emerald-50">
+       <div class="bg-gradient-to-br from-green-300 to-green-500 h-40 flex items-center justify-center text-5xl">
+        ⚽
+       </div>
+       <div class="p-4">
+        <h3 class="font-extrabold text-gray-800 text-sm mb-1">Mini Soccer</h3>
+        <p class="text-xs text-gray-500 mb-2">Setiap Kamis Malam - 2026</p>
+        <p class="text-xs text-gray-600">Kegiatan olahraga yang menyenangkan untuk mempererat silaturrahmi antar anggota ikhwan RISMAF.</p>
+       </div>
+      </div><!-- Dokumentasi Kegiatan 3 -->
+      <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover border border-emerald-50">
+       <div class="bg-gradient-to-br from-pink-300 to-pink-500 h-40 flex items-center justify-center text-5xl">
+        👭
+       </div>
+       <div class="p-4">
+        <h3 class="font-extrabold text-gray-800 text-sm mb-1">Halaqoh &amp; Tahsin Akhwat</h3>
+        <p class="text-xs text-gray-500 mb-2">Setiap Sabtu - 2026</p>
+        <p class="text-xs text-gray-600">Dokumentasi kegiatan halaqoh diskusi dan tahsin Al-Qur'an khusus untuk para akhwat RISMAF.</p>
+       </div>
+      </div><!-- Dokumentasi Kegiatan 4 -->
+      <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover border border-emerald-50">
+       <div class="bg-gradient-to-br from-indigo-300 to-indigo-500 h-40 flex items-center justify-center text-5xl">
+        🕌
+       </div>
+       <div class="p-4">
+        <h3 class="font-extrabold text-gray-800 text-sm mb-1">Qiyamulail Bersama</h3>
+        <p class="text-xs text-gray-500 mb-2">Malam Ahad - 2026</p>
+        <p class="text-xs text-gray-600">Dokumentasi ibadah qiyamulail (tahajjud) yang dilakukan bersama di masjid setiap malam Ahad.</p>
+       </div>
+      </div><!-- Dokumentasi Kegiatan 5 -->
+      <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover border border-emerald-50">
+       <div class="bg-gradient-to-br from-blue-300 to-blue-500 h-40 flex items-center justify-center text-5xl">
+        🧹
+       </div>
+       <div class="p-4">
+        <h3 class="font-extrabold text-gray-800 text-sm mb-1">Bersih-Bersih Masjid</h3>
+        <p class="text-xs text-gray-500 mb-2">Setiap Ahad Pagi - 2026</p>
+        <p class="text-xs text-gray-600">Dokumentasi kegiatan gotong royong membersihkan area Masjid Besar Al-Falah bersama-sama.</p>
+       </div>
+      </div><!-- Dokumentasi Kegiatan 6 -->
+      <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover border border-emerald-50">
+       <div class="bg-gradient-to-br from-amber-300 to-amber-500 h-40 flex items-center justify-center text-5xl">
+        🤝
+       </div>
+       <div class="p-4">
+        <h3 class="font-extrabold text-gray-800 text-sm mb-1">Program Sosial Kemasyarakatan</h3>
+        <p class="text-xs text-gray-500 mb-2">Berkelanjutan - 2026</p>
+        <p class="text-xs text-gray-600">Dokumentasi berbagai kegiatan sosial dan kemanusiaan RISMAF untuk masyarakat sekitar masjid.</p>
+       </div>
+      </div>
+     </div>
+     <div class="bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl p-6 border border-emerald-100">
+      <h3 class="font-extrabold text-emerald1 mb-2 flex items-center gap-2">📸 Album Foto Lengkap</h3>
+      <p class="text-xs text-gray-600 mb-4">Kunjungi galeri foto lengkap dokumentasi kegiatan RISMAF di Instagram resmi kami untuk melihat momen-momen spesial dan update terbaru.</p><a href="https://instagram.com/rismaf_bambuapus" target="_blank" rel="noopener noreferrer" class="btn-interactive inline-flex items-center gap-2 bg-pink-500 hover:bg-pink-600 text-white font-bold px-4 py-2 rounded-full text-xs transition"> <i data-lucide="instagram" style="width:14px;height:14px"></i> Kunjungi Instagram </a>
+     </div>
+    </div>
+   </section><!-- ========== STRUKTUR ========== -->
+   <section id="sec-struktur" class="section-page hidden">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+     <h2 class="text-xl font-black text-emerald1 mb-6 text-center">👥 Struktur Organisasi</h2><!-- Top Row: Pembina & Syuro -->
+     <div class="flex justify-center items-center gap-2 sm:gap-4 mb-3 flex-wrap">
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-center min-w-[120px]">
+       <p class="text-[10px] text-amber-600 font-bold uppercase tracking-wide">Pembina Ikhwan</p>
+      </div>
+      <div class="bg-emerald-50 border-2 border-emerald1 rounded-xl p-3 text-center min-w-[120px]">
+       <p class="text-[10px] text-emerald1 font-bold uppercase tracking-wide">Dewan Syuro</p>
+      </div>
+      <div class="bg-pink-50 border border-pink-200 rounded-xl p-3 text-center min-w-[120px]">
+       <p class="text-[10px] text-pink-600 font-bold uppercase tracking-wide">Pembina Akhwat</p>
+      </div>
+     </div><!-- Line down -->
+     <div class="flex justify-center">
+      <div class="w-0.5 h-6 bg-emerald1"></div>
+     </div><!-- Ketua Umum -->
+     <div class="flex justify-center mb-1">
+      <div class="bg-emerald1 text-white rounded-xl p-3 text-center shadow-lg min-w-[160px]">
+       <p class="text-xs font-black">KETUA UMUM</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 transition"><i data-lucide="message-circle" style="width:10px;height:10px"></i> Chat</a>
+      </div>
+     </div>
+     <div class="flex justify-center">
+      <div class="w-0.5 h-6 bg-emerald1"></div>
+     </div><!-- Sekjen & Koordinator Akhwat Row -->
+     <div class="flex justify-center gap-4 sm:gap-12 mb-1 flex-wrap">
+      <div class="text-center">
+       <div class="bg-white border-2 border-emerald1 rounded-xl p-3 shadow-md min-w-[140px]">
+        <p class="text-xs font-extrabold text-emerald1">SEKRETARIS JENDRAL</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 bg-emerald-100 hover:bg-emerald-200 text-emerald1 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 transition"><i data-lucide="message-circle" style="width:10px;height:10px"></i> Chat</a>
+       </div>
+       <div class="flex justify-center">
+        <div class="w-0.5 h-4 bg-emerald1"></div>
+       </div><!-- Sub -->
+       <div class="flex gap-2 justify-center flex-wrap">
+        <div class="bg-emerald-50 rounded-lg p-2 text-center border border-emerald-100 min-w-[100px]">
+         <p class="text-[10px] font-bold text-gray-700">Sekretaris Umum</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="text-[9px] text-emerald1 font-bold">💬 Chat</a>
+        </div>
+        <div class="bg-emerald-50 rounded-lg p-2 text-center border border-emerald-100 min-w-[100px]">
+         <p class="text-[10px] font-bold text-gray-700">Bendahara Umum</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="text-[9px] text-emerald1 font-bold">💬 Chat</a>
+        </div>
+       </div>
+      </div>
+      <div class="text-center">
+       <div class="bg-white border-2 border-pink-400 rounded-xl p-3 shadow-md min-w-[140px]">
+        <p class="text-xs font-extrabold text-pink-600">KOORDINATOR AKHWAT</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 bg-pink-100 hover:bg-pink-200 text-pink-600 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 transition"><i data-lucide="message-circle" style="width:10px;height:10px"></i> Chat</a>
+       </div>
+       <div class="flex justify-center">
+        <div class="w-0.5 h-4 bg-pink-400"></div>
+       </div>
+       <div class="bg-pink-50 rounded-lg p-2 text-center border border-pink-100 min-w-[120px]">
+        <p class="text-[10px] font-bold text-gray-700">Wakil Koordinator Akhwat</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="text-[9px] text-pink-600 font-bold">💬 Chat</a>
+       </div>
+      </div>
+     </div><!-- HUMAS -->
+     <div class="flex justify-center my-3">
+      <div class="flex justify-center">
+       <div class="w-0.5 h-4 bg-emerald1"></div>
+      </div>
+     </div>
+     <div class="flex justify-center mb-1">
+      <div class="bg-blue-50 border-2 border-blue-400 rounded-xl p-3 text-center shadow-md min-w-[140px]">
+       <p class="text-xs font-extrabold text-blue-600">HUMAS</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 bg-blue-100 hover:bg-blue-200 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 transition"><i data-lucide="message-circle" style="width:10px;height:10px"></i> Chat</a>
+      </div>
+     </div>
+     <div class="flex justify-center">
+      <div class="w-0.5 h-4 bg-emerald1"></div>
+     </div><!-- Divisi-divisi -->
+     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-xl mx-auto">
+      <div class="bg-white rounded-xl p-3 text-center shadow border border-gray-100 card-hover"><span class="text-xl">🤝</span>
+       <p class="text-[10px] font-bold text-gray-700 mt-1">Sosial Masyarakat</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="text-[9px] text-emerald1 font-bold">💬 Chat</a>
+      </div>
+      <div class="bg-white rounded-xl p-3 text-center shadow border border-gray-100 card-hover"><span class="text-xl">🎨</span>
+       <p class="text-[10px] font-bold text-gray-700 mt-1">Media Kreatif</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="text-[9px] text-emerald1 font-bold">💬 Chat</a>
+      </div>
+      <div class="bg-white rounded-xl p-3 text-center shadow border border-gray-100 card-hover"><span class="text-xl">⚽</span>
+       <p class="text-[10px] font-bold text-gray-700 mt-1">Olahraga</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="text-[9px] text-emerald1 font-bold">💬 Chat</a>
+      </div>
+      <div class="bg-white rounded-xl p-3 text-center shadow border border-gray-100 card-hover"><span class="text-xl">📦</span>
+       <p class="text-[10px] font-bold text-gray-700 mt-1">Logistik</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="text-[9px] text-emerald1 font-bold">💬 Chat</a>
+      </div>
+      <div class="bg-white rounded-xl p-3 text-center shadow border border-gray-100 card-hover"><span class="text-xl">🕌</span>
+       <p class="text-[10px] font-bold text-gray-700 mt-1">Siar Dakwah</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="text-[9px] text-emerald1 font-bold">💬 Chat</a>
+      </div>
+      <div class="bg-white rounded-xl p-3 text-center shadow border border-gray-100 card-hover"><span class="text-xl">💰</span>
+       <p class="text-[10px] font-bold text-gray-700 mt-1">Fundraising</p><a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="text-[9px] text-emerald1 font-bold">💬 Chat</a>
+      </div>
+     </div>
+    </div>
+   </section><!-- ========== PENGUMUMAN ========== -->
+   <section id="sec-pengumuman" class="section-page hidden">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+     <h2 class="text-xl font-black text-emerald1 mb-6 text-center">📢 Pengumuman</h2>
+     <div class="space-y-3" id="pengumuman-list"></div>
+    </div>
+   </section><!-- ========== JADWAL ========== -->
+   <section id="sec-jadwal" class="section-page hidden">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+     <h2 class="text-xl font-black text-emerald1 mb-6 text-center">📅 Jadwal Kegiatan</h2>
+     <div class="space-y-3" id="jadwal-list"></div>
+    </div>
+   </section><!-- ========== DONASI ========== -->
+   <section id="sec-donasi" class="section-page hidden">
+    <div class="max-w-lg mx-auto px-4 py-8">
+     <h2 class="text-xl font-black text-emerald1 mb-6 text-center">💝 Donasi &amp; Infaq</h2>
+     <div class="donate-card rounded-2xl p-6 text-white text-center shadow-xl mb-4">
+      <div class="text-4xl mb-2">
+       🕌
+      </div>
+      <p class="text-sm font-bold text-emerald-200 mb-1">Bank Syariah Indonesia (BSI)</p>
+      <p class="text-3xl font-black tracking-widest my-3" id="rek-number">7777 999 208</p>
+      <p class="text-sm text-emerald-200">a.n <strong class="text-white">Remaja Islam Masjid Al-Falah</strong></p><button onclick="copyRek()" id="copy-btn" class="mt-4 bg-white/20 hover:bg-white/30 text-white font-bold px-4 py-2 rounded-full text-xs transition inline-flex items-center gap-1"> <i data-lucide="copy" style="width:14px;height:14px"></i> Salin No. Rekening </button>
+     </div>
+     <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-4">
+      <h3 class="font-extrabold text-amber-700 text-sm mb-2">📝 Catatan Penting</h3>
+      <p class="text-xs text-gray-600 leading-relaxed">Tambahkan <strong>kode unik</strong> di belakang nominal transfer sebagai identifikasi. Contoh: jika donasi Rp50.000, transfer <strong>Rp50.001</strong> (tambah Rp1 sebagai kode unik).</p>
+     </div>
+     <div class="flex gap-2"><a href="https://forms.gle/oYFvntMJjXdVMHep8" target="_blank" rel="noopener noreferrer" class="flex-1 bg-emerald1 hover:bg-emerald2 text-white font-bold py-3 rounded-xl text-xs text-center transition inline-flex items-center justify-center gap-1"> <i data-lucide="check-circle" style="width:14px;height:14px"></i> Konfirmasi Donasi </a> <a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="flex-1 bg-white border-2 border-emerald1 text-emerald1 font-bold py-3 rounded-xl text-xs text-center transition hover:bg-emerald-50 inline-flex items-center justify-center gap-1"> <i data-lucide="message-circle" style="width:14px;height:14px"></i> Kontak Admin </a>
+     </div>
+    </div>
+   </section><!-- MODAL for Pengumuman Detail -->
+   <div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal-content p-6">
+     <div class="flex justify-between items-start mb-3">
+      <h3 id="modal-title" class="font-extrabold text-emerald1 text-lg pr-4"></h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 shrink-0"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+     </div>
+     <p id="modal-date" class="text-xs text-gray-400 mb-3"></p>
+     <div id="modal-body" class="text-sm text-gray-600 leading-relaxed"></div>
+    </div>
+   </div><!-- ========== FOOTER ========== -->
+   <footer class="bg-darkgreen text-white mt-8">
+    <div class="max-w-6xl mx-auto px-4 py-8 grid sm:grid-cols-3 gap-6"><!-- Nav Cepat -->
+     <div>
+      <h4 class="font-extrabold text-sm mb-3 text-emerald-300">NAVIGASI CEPAT</h4>
+      <ul class="space-y-1.5">
+       <li><button onclick="showSection('profil')" class="text-xs text-emerald-200 hover:text-white transition">📖 Visi &amp; Misi</button></li>
+       <li><button onclick="showSection('jadwal')" class="text-xs text-emerald-200 hover:text-white transition">📅 Jadwal Kajian</button></li>
+       <li><button onclick="showSection('struktur')" class="text-xs text-emerald-200 hover:text-white transition">👥 Kepengurusan</button></li>
+       <li><a href="https://forms.gle/xNQKqfauwDb5sWPZ9" target="_blank" rel="noopener noreferrer" class="text-xs text-emerald-200 hover:text-white transition">📋 Syarat Anggota</a></li>
+      </ul>
+     </div><!-- Lokasi & Kontak -->
+     <div>
+      <h4 class="font-extrabold text-sm mb-3 text-emerald-300">LOKASI &amp; KONTAK</h4><a href="https://maps.app.goo.gl/bmw8xQ4jXtUn8rySA" target="_blank" rel="noopener noreferrer" class="text-xs text-emerald-200 hover:text-white transition leading-relaxed block mb-2">📍 Jl. Bambu Apus Raya No.55, RT.1/RW.4, Ceger, Kota Jakarta Timur, DKI Jakarta 13890</a>
+      <div class="flex gap-2 mt-2"><a href="https://instagram.com/rismaf_bambuapus" target="_blank" rel="noopener noreferrer" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition"><i data-lucide="instagram" style="width:16px;height:16px"></i></a> <a href="https://wa.me/6208558874608" target="_blank" rel="noopener noreferrer" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition"><i data-lucide="message-circle" style="width:16px;height:16px"></i></a> <a href="mailto:rismafbambuapus@gmail.com" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition"><i data-lucide="mail" style="width:16px;height:16px"></i></a>
+      </div>
+     </div><!-- Info Pendaftaran -->
+     <div>
+      <h4 class="font-extrabold text-sm mb-3 text-emerald-300">INFO PENDAFTARAN</h4>
+      <p class="text-xs text-emerald-200 font-bold mb-2">Syarat &amp; Ketentuan Anggota:</p>
+      <ol class="text-[10px] text-emerald-300 space-y-1 list-decimal pl-3">
+       <li>Muslim/Muslimah</li>
+       <li>Berusia 15 - 30 tahun</li>
+       <li>Domisili Jakarta Timur (diutamakan) dan sekitarnya</li>
+       <li>Mendaftarkan diri melalui formulir resmi</li>
+       <li>Bersedia mematuhi AD/ART serta aturan Masjid Besar Al-Falah</li>
+      </ol><a href="https://forms.gle/xNQKqfauwDb5sWPZ9" target="_blank" rel="noopener noreferrer" class="mt-3 inline-block bg-emerald1 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-full transition">Daftar Sekarang →</a>
+     </div>
+    </div>
+    <div class="border-t border-white/10 mt-6 pt-4 text-center">
+     <p class="text-[10px] text-emerald-400">© 2025 RISMAF - Remaja Islam Masjid Al-Falah, Bambu Apus. Semua hak dilindungi.</p>
+    </div>
+   </footer>
+  </div>
+  <script>
+// ===== CLOCK =====
+function updateClock(){
+const now=new Date();
+const opts={timeZone:'Asia/Jakarta'};
+const time=now.toLocaleTimeString('id-ID',{...opts,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+const date=now.toLocaleDateString('id-ID',{...opts,weekday:'long',year:'numeric',month:'long',day:'numeric'});
+const el=document.getElementById('clock');if(el)el.textContent=time;
+const el2=document.getElementById('date');if(el2)el2.textContent=date;
+const el3=document.getElementById('clock-mobile');if(el3)el3.textContent=time;
+const el4=document.getElementById('date-mobile');if(el4)el4.textContent=date;
+}
+updateClock();setInterval(updateClock,1000);
+
+// ===== NAVIGATION =====
+function showSection(id){
+document.querySelectorAll('.section-page').forEach(s=>s.classList.add('hidden'));
+document.getElementById('sec-'+id).classList.remove('hidden');
+document.querySelectorAll('.nav-btn').forEach(b=>{b.classList.remove('nav-active');b.classList.add('text-gray-600')});
+const btn=document.querySelector(`.nav-btn[data-section="${id}"]`);
+if(btn){btn.classList.add('nav-active');btn.classList.remove('text-gray-600')}
+document.getElementById('app').scrollTo({top:0,behavior:'smooth'});
+}
+
+// ===== PENGUMUMAN DATA =====
+const pengumuman=[
+{id:1,title:'Kajian Rutin Pekan Ini',date:'Jumat, 10 Januari 2026',tag:'Kajian',color:'emerald',summary:'Kajian Ba\'da Maghrib dengan tema Adab Bermedia Sosial.',detail:'Kajian rutin mingguan RISMAF akan diadakan pada hari Jumat ba\'da shalat Maghrib di Masjid Besar Al-Falah. Tema pekan ini adalah <strong>"Adab Bermedia Sosial dalam Islam"</strong>. Kajian dibawakan oleh Ustadz pilihan. Diharapkan seluruh anggota dan masyarakat umum dapat hadir. Dresscode: pakaian muslim rapi.'},
+{id:2,title:'Mini Soccer - Olahraga',date:'Setiap Kamis, 20:00 - 22:00 WIB',tag:'Olahraga',color:'green',summary:'Pertandingan mini soccer rutin untuk semua anggota RISMAF Ikhwan.',detail:'Kegiatan olahraga mini soccer rutin setiap Kamis malam, dimulai pukul 20:00 hingga 22:00 WIB. Kegiatan ini bertujuan untuk menjaga kesehatan, melatih kerja sama tim, dan mempererat silaturrahmi antar anggota. Semua anggota Ikhwan diundang untuk berpartisipasi. Tempat: lapangan dekat Masjid Al-Falah.'},
+{id:3,title:'Halaqoh Akhwat - Kemuslimatan',date:'Setiap Sabtu, 16:00 - 17:30 WIB',tag:'Kemuslimatan',color:'pink',summary:'Halaqoh (diskusi) khusus untuk akhwat (perempuan) RISMAF.',detail:'Halaqoh akhwat diadakan setiap Sabtu sore pukul 16:00 - 17:30 WIB di ruang khusus akhwat Masjid Al-Falah. Dalam halaqoh ini, para akhwat berbagi ilmu, pengalaman, dan saling memberikan motivasi dalam membangun iman dan ketaqwaan. Topik yang dibahas relevan dengan kehidupan sehari-hari remaja perempuan Muslim.'},
+{id:4,title:'Tahsin Akhwat RISMAF - Kemuslimatan',date:'Setiap Sabtu, 17:30 - Maghrib',tag:'Kemuslimatan',color:'orange',summary:'Pembelajaran tahsin (perbaikan bacaan) Al-Qur\'an khusus akhwat.',detail:'Kegiatan tahsin (perbaikan dan peningkatan bacaan Al-Qur\'an) khusus untuk akhwat RISMAF diadakan setiap Sabtu sore setelah Halaqoh, dimulai pukul 17:30 sampai waktu Maghrib. Dipandu oleh pengajar tahsin yang berpengalaman. Semua akhwat, baik pemula maupun yang sudah mahir, dapat mengikuti kegiatan ini.'},
+{id:5,title:'Qiyamulail - Kemuslimatan',date:'Setiap Malam Ahad',tag:'Kemuslimatan',color:'blue',summary:'Ibadah qiyamulail (tahajjud) yang dilakukan bersama di malam Ahad.',detail:'Qiyamulail (shalat tahajjud) dilakukan bersama setiap malam Ahad (malam yang menjelang hari Ahad) di Masjid Besar Al-Falah. Kegiatan ini bertujuan untuk meningkatkan ketaqwaan, mendekatkan diri kepada Allah, dan membiasakan diri melakukan ibadah di tengah malam. Diharapkan seluruh anggota RISMAF, khususnya yang dapat hadir di waktu malam, dapat memanfaatkan kesempatan ini.'},
+{id:6,title:'Pendaftaran Anggota Baru Dibuka!',date:'Januari 2026',tag:'Pendaftaran',color:'yellow',summary:'Periode pendaftaran anggota baru RISMAF telah dibuka.',detail:'RISMAF membuka kesempatan bagi pemuda/pemudi Muslim usia 15-30 tahun untuk bergabung! Pendaftaran dilakukan melalui formulir online resmi. Syarat: Muslim/Muslimah, berdomisili di Jakarta Timur dan sekitarnya, serta bersedia mematuhi AD/ART organisasi. <br><br><strong>Segera daftarkan dirimu dan jadilah bagian dari keluarga RISMAF!</strong>'},
+{id:7,title:'Bersih-Bersih Masjid',date:'Ahad, 12 Januari 2026',tag:'Kegiatan',color:'purple',summary:'Kegiatan gotong royong membersihkan area Masjid Al-Falah.',detail:'Kegiatan bersih-bersih masjid rutin akan diadakan pada hari Ahad pukul 07:00 - 09:00 WIB. Seluruh anggota RISMAF diharapkan hadir membawa peralatan kebersihan pribadi. Mari bersama-sama memakmurkan Masjid Al-Falah!'},
+{id:8,title:'Rapat Koordinasi Bulanan',date:'Sabtu, 18 Januari 2026',tag:'Internal',color:'indigo',summary:'Rakor bulanan untuk evaluasi dan perencanaan kegiatan.',detail:'Rapat koordinasi bulanan RISMAF akan membahas evaluasi kegiatan bulan lalu, perencanaan kegiatan bulan depan, serta koordinasi antar divisi. Wajib dihadiri seluruh pengurus inti dan kepala divisi. Tempat: Aula Masjid Al-Falah, pukul 09:00 WIB.'}
+];
+
+const colorMap={emerald:'bg-emerald-100 text-emerald-700',yellow:'bg-yellow-100 text-yellow-700',blue:'bg-blue-100 text-blue-700',purple:'bg-purple-100 text-purple-700',green:'bg-green-100 text-green-700',pink:'bg-pink-100 text-pink-700',orange:'bg-orange-100 text-orange-700',indigo:'bg-indigo-100 text-indigo-700'};
+
+function renderPengumuman(){
+const c=document.getElementById('pengumuman-list');
+c.innerHTML=pengumuman.map(p=>`
+<div class="bg-white rounded-2xl shadow-md p-5 card-hover border border-gray-100">
+<div class="flex items-start justify-between gap-3">
+<div class="flex-1">
+<span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${colorMap[p.color]} mb-2">${p.tag}</span>
+<h3 class="font-extrabold text-gray-800 text-sm">${p.title}</h3>
+<p class="text-[10px] text-gray-400 mt-0.5">${p.date}</p>
+<p class="text-xs text-gray-600 mt-2">${p.summary}</p>
+</div>
+<button onclick="openModal(${p.id})" class="shrink-0 bg-emerald1 hover:bg-emerald2 text-white text-[10px] font-bold px-3 py-1.5 rounded-full transition mt-1">Detail</button>
+</div>
+</div>
+`).join('');
+}
+
+function openModal(id){
+const p=pengumuman.find(x=>x.id===id);if(!p)return;
+document.getElementById('modal-title').textContent=p.title;
+document.getElementById('modal-date').textContent=p.date;
+document.getElementById('modal-body').innerHTML=p.detail;
+document.getElementById('modal').classList.add('active');
+}
+function closeModal(){document.getElementById('modal').classList.remove('active')}
+
+// ===== JADWAL DATA =====
+const jadwal=[
+{hari:'Kamis',waktu:'20:00 - 22:00 WIB',kegiatan:'Mini Soccer',lokasi:'Lapangan Dekat Masjid',emoji:'⚽',bg:'bg-green-50'},
+{hari:'Sabtu',waktu:'16:00 - 17:30 WIB',kegiatan:'Halaqoh Akhwat',lokasi:'Ruang Akhwat Masjid',emoji:'👭',bg:'bg-pink-50'},
+{hari:'Sabtu',waktu:'17:30 - Maghrib',kegiatan:'Tahsin Akhwat RISMAF',lokasi:'Ruang Akhwat Masjid',emoji:'📖',bg:'bg-orange-50'},
+{hari:'Malam Ahad',waktu:'00:00 - Pagi',kegiatan:'Qiyamulail',lokasi:'Masjid Al-Falah',emoji:'🕌',bg:'bg-indigo-50'},
+{hari:'Jumat',waktu:'18:30 - 20:00 WIB',kegiatan:'Kajian Ba\'da Maghrib',lokasi:'Masjid Al-Falah',emoji:'📚',bg:'bg-emerald-50'},
+{hari:'Ahad',waktu:'07:00 - 09:00 WIB',kegiatan:'Bersih-Bersih Masjid',lokasi:'Area Masjid',emoji:'🧹',bg:'bg-blue-50'},
+{hari:'Sabtu (Pekan ke-2)',waktu:'09:00 - 11:00 WIB',kegiatan:'Rapat Koordinasi Bulanan',lokasi:'Aula Masjid',emoji:'📋',bg:'bg-purple-50'}
+];
+
+function renderJadwal(){
+const c=document.getElementById('jadwal-list');
+c.innerHTML=jadwal.map(j=>`
+<div class="${j.bg} rounded-2xl p-4 card-hover border border-gray-100 flex items-center gap-3">
+<div class="text-3xl">${j.emoji}</div>
+<div class="flex-1">
+<p class="font-extrabold text-gray-800 text-sm">${j.kegiatan}</p>
+<p class="text-xs text-gray-500">${j.hari} • ${j.waktu}</p>
+<p class="text-[10px] text-gray-400">📍 ${j.lokasi}</p>
+</div>
+</div>
+`).join('');
+}
+
+// ===== COPY REKENING =====
+function copyRek(){
+const t='7777999208';
+navigator.clipboard.writeText(t).then(()=>{
+const btn=document.getElementById('copy-btn');
+btn.innerHTML='<i data-lucide="check" style="width:14px;height:14px"></i> Tersalin!';
+setTimeout(()=>{btn.innerHTML='<i data-lucide="copy" style="width:14px;height:14px"></i> Salin No. Rekening';lucide.createIcons()},2000);
+lucide.createIcons();
+});
+}
+
+// ===== INIT =====
+renderPengumuman();
+renderJadwal();
+lucide.createIcons();
+
+// ===== ELEMENT SDK =====
+const defaultConfig={hero_title:'Remaja Islam Masjid Al-Falah',hero_subtitle:'RISMAF Bambu Apus',background_color:'#f5f0e8',surface_color:'#ffffff',text_color:'#1f2937',primary_action_color:'#0d9255',secondary_action_color:'#d4a843',font_family:'Nunito',font_size:14};
+
+window.elementSdk.init({
+defaultConfig,
+onConfigChange:async(config)=>{
+const bg=config.background_color||defaultConfig.background_color;
+const sf=config.surface_color||defaultConfig.surface_color;
+const tx=config.text_color||defaultConfig.text_color;
+const pa=config.primary_action_color||defaultConfig.primary_action_color;
+const sa=config.secondary_action_color||defaultConfig.secondary_action_color;
+const ff=config.font_family||defaultConfig.font_family;
+const fs=config.font_size||defaultConfig.font_size;
+
+document.getElementById('app').style.backgroundColor=bg;
+document.querySelectorAll('.bg-white,.bg-cream').forEach(e=>e.style.backgroundColor=sf);
+
+const ht=document.getElementById('hero-title');if(ht){ht.textContent=config.hero_title||defaultConfig.hero_title;ht.style.fontFamily=ff+', Nunito, sans-serif';ht.style.fontSize=(fs*2)+'px'}
+const hs=document.getElementById('hero-subtitle');if(hs){hs.textContent=config.hero_subtitle||defaultConfig.hero_subtitle;hs.style.fontFamily=ff+', Nunito, sans-serif'}
+document.body.style.fontFamily=ff+', Nunito, sans-serif';
+},
+mapToCapabilities:(config)=>({
+recolorables:[
+{get:()=>config.background_color||defaultConfig.background_color,set:v=>{config.background_color=v;window.elementSdk.setConfig({background_color:v})}},
+{get:()=>config.surface_color||defaultConfig.surface_color,set:v=>{config.surface_color=v;window.elementSdk.setConfig({surface_color:v})}},
+{get:()=>config.text_color||defaultConfig.text_color,set:v=>{config.text_color=v;window.elementSdk.setConfig({text_color:v})}},
+{get:()=>config.primary_action_color||defaultConfig.primary_action_color,set:v=>{config.primary_action_color=v;window.elementSdk.setConfig({primary_action_color:v})}},
+{get:()=>config.secondary_action_color||defaultConfig.secondary_action_color,set:v=>{config.secondary_action_color=v;window.elementSdk.setConfig({secondary_action_color:v})}}
+],
+borderables:[],
+fontEditable:{get:()=>config.font_family||defaultConfig.font_family,set:v=>{config.font_family=v;window.elementSdk.setConfig({font_family:v})}},
+fontSizeable:{get:()=>config.font_size||defaultConfig.font_size,set:v=>{config.font_size=v;window.elementSdk.setConfig({font_size:v})}}
+}),
+mapToEditPanelValues:(config)=>new Map([
+['hero_title',config.hero_title||defaultConfig.hero_title],
+['hero_subtitle',config.hero_subtitle||defaultConfig.hero_subtitle]
+])
+});
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e88f49503068e9d',t:'MTc3NTU2NDEwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
